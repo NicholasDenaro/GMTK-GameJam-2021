@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/Game/.vs/Game
+/Game/Game/bin/Debug
+/Game/Game/obj
