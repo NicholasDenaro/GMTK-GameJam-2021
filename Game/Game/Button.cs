@@ -16,19 +16,23 @@ namespace Game
         private Action pressAction;
         private bool isDown;
 
-        private Button(int x, int y, Action pressAction) : base(Sprite.Sprites["text"], x, y, 64, 48)
+        private Button(int x, int y, Color color, Action pressAction, int scaleDown)
+            : base(Sprite.Sprites["text"], x, y, 64 / scaleDown, 48 / scaleDown)
         {
             this.pressAction = pressAction;
-            bitmapUp = BitmapExtensions.CreateBitmap(64, 48);
-            bitmapDown = BitmapExtensions.CreateBitmap(64, 48);
+            bitmapUp = BitmapExtensions.CreateBitmap(64 / scaleDown, 48 / scaleDown);
+            bitmapDown = BitmapExtensions.CreateBitmap(64 / scaleDown, 48 / scaleDown);
             Graphics gfx = Graphics.FromImage(bitmapUp);
-            gfx.FillEllipse(Brushes.DarkRed, new Rectangle(0, 16, 64, 32));
-            gfx.FillRectangle(Brushes.DarkRed, new Rectangle(0, 16, 64, 16));
-            gfx.FillEllipse(Brushes.Red, new Rectangle(0, 0, 64, 32));
+
+            Brush b = new SolidBrush(color);
+            Brush b2 = new SolidBrush(Color.FromArgb(color.A, color.R / 2, color.G / 2, color.B / 2));
+            gfx.FillEllipse(b2, new Rectangle(0, 16 / scaleDown, 64 / scaleDown, 32 / scaleDown));
+            gfx.FillRectangle(b2, new Rectangle(0, 16 / scaleDown, 64 / scaleDown, 16 / scaleDown));
+            gfx.FillEllipse(b, new Rectangle(0, 0, 64 / scaleDown, 32 / scaleDown));
 
             gfx = Graphics.FromImage(bitmapDown);
-            gfx.FillEllipse(Brushes.DarkRed, new Rectangle(0, 16, 64, 32));
-            gfx.FillEllipse(Brushes.Red, new Rectangle(0, 8, 64, 32));
+            gfx.FillEllipse(b2, new Rectangle(0, 16 / scaleDown, 64 / scaleDown, 32 / scaleDown));
+            gfx.FillEllipse(b, new Rectangle(0, 8 / scaleDown, 64 / scaleDown, 32 / scaleDown));
         }
 
         private void Tick(Location location, Entity entity)
@@ -55,9 +59,9 @@ namespace Game
             return isDown ? bitmapDown : bitmapUp;
         }
 
-        public static GEntity<Button> Create(int x, int y, Action pressAction)
+        public static GEntity<Button> Create(int x, int y, Color color, Action pressAction, int scaleDown = 1)
         {
-            Button button = new Button(x, y, pressAction);
+            Button button = new Button(x, y, color, pressAction, scaleDown);
             button.DrawAction += button.Draw;
             GEntity<Button> entity = new GEntity<Button>(button);
             entity.TickAction += button.Tick;

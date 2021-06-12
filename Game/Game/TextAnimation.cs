@@ -17,12 +17,13 @@ namespace Game
         Guid id;
         Font font;
 
-        private TextAnimation(int x, int y, string text, Color color, int size) : base(Sprite.Sprites["text"], x: x, y: y, Program.ScreenWidth, Program.ScreenHeight)
+        private TextAnimation(int x, int y, string text, Color color, int size) : base(Sprite.Sprites["text"], x: x, y: y, 100, 50)
         {
             this.text = text;
             this.color = color;
             this.font = new Font("Arial", size);
-            bmp = BitmapExtensions.CreateBitmap(Program.ScreenWidth, Program.ScreenHeight);
+            bmp = BitmapExtensions.CreateBitmap(100, 50);
+            bmp.MakeTransparent();
             gfx = Graphics.FromImage(bmp);
             time = Program.TPS;
         }
@@ -30,7 +31,7 @@ namespace Game
         private void Tick(Location location, Entity entity)
         {
             this.ChangeCoordsDelta((time % 4 == 0) ? 1 : 0, -1);
-            if (--time == 0)
+            if (--time <= 0)
             {
                 location.RemoveEntity(id);
             }
@@ -39,7 +40,7 @@ namespace Game
         private Bitmap Draw()
         {
             gfx.Clear(Color.Transparent);
-            Brush brush = new SolidBrush(Color.FromArgb((int)(time * 255.0 / Program.TPS), color));
+            using Brush brush = new SolidBrush(Color.FromArgb((int)(time * 255.0 / Program.TPS), color));
             gfx.DrawString(text, font, brush, 0, 0);
 
             return bmp;

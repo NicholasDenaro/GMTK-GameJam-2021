@@ -20,24 +20,23 @@ namespace Game
         public int screen;
         public GEntity<UIBar> HealthBar { get; set; }
 
-        private int target;
         private Fighter[] targets;
 
         private bool removed;
 
-        private Enemy(int x, int y, int level, int screen) : base(Sprite.Sprites["text"], x: x, y: y, 48, 64)
+        private Enemy(int x, int y, int level, int screen) : base(Sprite.Sprites["chicken"], x: x, y: y, 64, 64)
         {
             this.Level = level;
-            this.Health = (int)Math.Pow(1.2, level) * 10;
+            this.Health = (int)Math.Pow(1.2, level) * 10 * (this.Level == 10 ? 20 : 1); // Boss health
             this.maxHealth = Health;
-            this.damage = (int)Math.Pow(1.01, level);
-            ////this.damage = 5;
+            this.damage = (int)Math.Pow(1.1, level);
             this.speed = 1 + level / 10;
             this.screen = screen;
             AttackTimer = Program.TPS * 5 / (1 + (speed / 3));
-            bmp = BitmapExtensions.CreateBitmap(48, 64);
-            Graphics gfx = Graphics.FromImage(bmp);
-            gfx.FillRectangle(Brushes.MediumPurple, 0, 0, 48, 64);
+            ////bmp = BitmapExtensions.CreateBitmap(48, 64);
+            ////Graphics gfx = Graphics.FromImage(bmp);
+            ////gfx.FillRectangle(Brushes.MediumPurple, 0, 0, 48, 64);
+            bmp = new Bitmap(Image());
         }
 
         public float HealthPercentage()
@@ -70,7 +69,7 @@ namespace Game
                 return;
             }
 
-            if (Health == 0)
+            if (Health <= 0)
             {
                 Destroy();
                 Program.SummonEnemy(screen);
@@ -80,7 +79,7 @@ namespace Game
 
             if (AttackTimer <= 0)
             {
-                Attack(targets[target++ % targets.Length]);
+                Attack(targets[Program.NextTarget++ % targets.Length]);
                 AttackTimer = Program.TPS * 5 / (1 + (speed / 3));
             }
         }

@@ -6,8 +6,50 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Backgrounds\caves.PNG" />
+    <None Remove="Resources\Backgrounds\caves2.PNG" />
+    <None Remove="Resources\Backgrounds\forrest.PNG" />
+    <None Remove="Resources\Backgrounds\forrest2.PNG" />
+    <None Remove="Resources\Backgrounds\grassland.PNG" />
+    <None Remove="Resources\Backgrounds\grassland2.PNG" />
+    <None Remove="Resources\mobs\ash_zombie.png" />
+    <None Remove="Resources\mobs\bat.png" />
+    <None Remove="Resources\mobs\bear.png" />
+    <None Remove="Resources\mobs\chicken.png" />
+    <None Remove="Resources\mobs\golem.png" />
+    <None Remove="Resources\mobs\grey wolf.png" />
+    <None Remove="Resources\mobs\ox.png" />
+    <None Remove="Resources\mobs\pig.png" />
+    <None Remove="Resources\mobs\sheep.png" />
+    <None Remove="Resources\mobs\spider.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Backgrounds\caves.PNG" />
+    <EmbeddedResource Include="Resources\Backgrounds\caves2.PNG" />
+    <EmbeddedResource Include="Resources\Backgrounds\forrest.PNG" />
+    <EmbeddedResource Include="Resources\Backgrounds\forrest2.PNG" />
+    <EmbeddedResource Include="Resources\Backgrounds\grassland.PNG" />
+    <EmbeddedResource Include="Resources\Backgrounds\grassland2.PNG" />
+    <EmbeddedResource Include="Resources\mobs\ash_zombie.png" />
+    <EmbeddedResource Include="Resources\mobs\bat.png" />
+    <EmbeddedResource Include="Resources\mobs\bear.png" />
+    <EmbeddedResource Include="Resources\mobs\chicken.png" />
+    <EmbeddedResource Include="Resources\mobs\golem.png" />
+    <EmbeddedResource Include="Resources\mobs\grey wolf.png" />
+    <EmbeddedResource Include="Resources\mobs\ox.png" />
+    <EmbeddedResource Include="Resources\mobs\pig.png" />
+    <EmbeddedResource Include="Resources\mobs\sheep.png" />
+    <EmbeddedResource Include="Resources\mobs\spider.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="GameEngine" Version="1.0.2" />
     <PackageReference Include="GameEngine.UI.AvaloniaUI" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Backgrounds\grassland.PNG" />
   </ItemGroup>
 
 </Project>

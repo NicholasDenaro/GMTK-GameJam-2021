@@ -17,6 +17,8 @@ namespace Game
         private int maxHealth;
         public int Health { get; private set; }
 
+        public int SkillPoints { get; private set; }
+
         private Bitmap bmp;
         private Graphics gfx;
 
@@ -43,9 +45,41 @@ namespace Game
             gfx.FillRectangle(Brushes.OrangeRed, 0, 0, 48, 64);
         }
 
+        public void UpgradeDamage()
+        {
+            if (this.SkillPoints > 0)
+            {
+                this.damage++;
+                this.SkillPoints--;
+            }
+        }
+
+        public void UpgradeSpeed()
+        {
+            if (this.SkillPoints > 0)
+            {
+                this.speed++;
+                this.SkillPoints--;
+                if (this.speed == 4)
+                {
+                    this.speed = 1;
+                    this.attacks++;
+                }
+            }
+        }
+
+        public void UpgradeHealth()
+        {
+            if (this.SkillPoints > 0)
+            {
+                this.maxHealth = (int)(this.maxHealth * 1.25);
+                this.SkillPoints--;
+            }
+        }
+
         private int TickTimeForAttack()
         {
-            return (int)(Program.TPS * SecondsPerAttack / (1 + (speed / 3)));
+            return (int)(Program.TPS * SecondsPerAttack / (speed * 0.5f));
         }
 
         private void ResetAttackTimer()
@@ -85,11 +119,12 @@ namespace Game
             {
                 this.exp -= ExpNeeded();
                 this.Level++;
-                Program.Engine.Location.AddEntity(TextAnimation.Create(X, Y, "Level up!", Color.White, 15));
+                this.SkillPoints++;
+                Program.AddEntity(TextAnimation.Create(X, Y, "Level up!", Color.White, 15));
             }
             else
             {
-                Program.Engine.Location.AddEntity(TextAnimation.Create(X + Width / 2, Y - 4, $"{exp}xp", Color.White, 10));
+                Program.AddEntity(TextAnimation.Create(X + Width / 2, Y - 4, $"{exp}xp", Color.White, 10));
             }
         }
 
@@ -125,15 +160,30 @@ namespace Game
 
         private void Attack(Enemy enemy)
         {
-            int damage = this.damage;
-            if (enemy.Damage(damage))
+            if (enemy.Health <= 0)
             {
-                Program.GiveExp(screen, enemy.Level);
+                return;
             }
 
             int x = (int)enemy.X + enemy.Width / 2 + Program.Random.Next(-16, 16);
             int y = (int)enemy.Y - 4 + Program.Random.Next(-4, 4);
-            Program.Engine.Location.AddEntity(TextAnimation.Create(x, y, "" + damage, Color.White, 15));
+
+            int damage = this.damage;
+            bool killed = false;
+            for (int i = 0; i < attacks; i++)
+            {
+                Program.AddEntity(TextAnimation.Create(x, y, "" + damage, Color.White, 15));
+                x += 3;
+                y -= 8;
+                killed |= enemy.Damage(damage);
+            }
+
+            if (killed)
+            {
+                Program.GiveExp(screen, enemy.Level);
+                Program.Killed(screen);
+            }
+
         }
 
         private Bitmap Draw()
