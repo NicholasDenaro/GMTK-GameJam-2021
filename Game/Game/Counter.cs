@@ -12,57 +12,42 @@ namespace Game
     class Counter : Description2D
     {
         string name;
-        float value;
+        Func<int> value;
         Bitmap bmp;
         Graphics gfx;
 
-        private Counter(string name, int baseValue, int pos) : base(Sprite.Sprites["text"], x: 0, y: pos, Program.ScreenWidth, Program.ScreenHeight)
+        private Counter(int x, int y, string name, Func<int> value) : base(Sprite.Sprites["text"], x: x, y: y, Program.ScreenWidth, 20)
         {
             this.name = name;
-            this.value = baseValue;
+            this.value = value;
             bmp = BitmapExtensions.CreateBitmap(Program.ScreenWidth, Program.ScreenHeight);
             gfx = Graphics.FromImage(bmp);
         }
 
         public void Tick(Location loc, Entity entity)
         {
-            ////Increment();
-            ////if (Program.Engine.Controllers.First()[(int)Program.Actions.ACTION].IsPress())
-            ////{
-            ////    Increment(TPS);
-            ////    //frame.PlaySound(new AvaloniaSound(new MML("l8cdefgab1").GetChannel(0)));
-            ////}
-            ////if (Program.Engine.Controllers.Skip(1).First()[(int)Program.Actions.CLICK].IsPress())
-            ////{
-            ////    Increment(100 * TPS);
-            ////}
-
-        }
-        public void Increment(int i = 1)
-        {
-            //value += i / TPS.0f;
         }
 
-        public new Image Image()
-        {
-            return bmp;
-        }
+        ////public new Image Image()
+        ////{
+        ////    return bmp;
+        ////}
 
         private Bitmap Draw()
         {
-            string text = $"{name}: {(int)value}";
+            string text = $"{name}: {value()}";
 
             gfx.Clear(Color.Transparent);
-            gfx.DrawString(text, new Font("Arial", 15), Brushes.White, 0, 0);
+            gfx.DrawString(text, new Font("Arial", 10), Brushes.Black, 0, 0);
 
             return bmp;
         }
 
-        public static Entity Create(string name, int baseValue, int pos)
+        public static GEntity<Counter> Create(int x, int y, string name, Func<int> value)
         {
-            Counter counter = new Counter(name, baseValue, pos);
+            Counter counter = new Counter(x, y, name, value);
             counter.DrawAction += counter.Draw;
-            Entity entity = new Entity(counter);
+            GEntity<Counter> entity = new GEntity<Counter>(counter);
             entity.TickAction += counter.Tick;
             return entity;
         }

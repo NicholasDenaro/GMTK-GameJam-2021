@@ -1,5 +1,6 @@
 ﻿using GameEngine;
 using GameEngine._2D;
+using GameEngine.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,10 +13,12 @@ namespace Game
     {
         private Bitmap bitmapUp;
         private Bitmap bitmapDown;
+        private Action pressAction;
         private bool isDown;
 
-        private Button(int x, int y) : base(Sprite.Sprites["text"], x, y, 64, 48)
+        private Button(int x, int y, Action pressAction) : base(Sprite.Sprites["text"], x, y, 64, 48)
         {
+            this.pressAction = pressAction;
             bitmapUp = BitmapExtensions.CreateBitmap(64, 48);
             bitmapDown = BitmapExtensions.CreateBitmap(64, 48);
             Graphics gfx = Graphics.FromImage(bitmapUp);
@@ -32,8 +35,15 @@ namespace Game
         {
             if (Program.Engine.Controllers.Skip(1).First()[(int)Program.Actions.CLICK].IsPress())
             {
-                isDown = true;
+                WindowsMouseController wmc = Program.Engine.Controllers.Skip(1).First() as WindowsMouseController;
+                MouseControllerInfo mci = wmc[(int)Program.Actions.MOUSEINFO].Info as MouseControllerInfo;
+                if (this.Bounds.Contains(new Point(mci.X, mci.Y)))
+                {
+                    isDown = true;
+                    pressAction();
+                }
             }
+
             if (Program.Engine.Controllers.Skip(1).First()[(int)Program.Actions.CLICK].State == HoldState.RELEASE)
             {
                 isDown = false;
@@ -45,11 +55,11 @@ namespace Game
             return isDown ? bitmapDown : bitmapUp;
         }
 
-        public static Entity Create(int x, int y)
+        public static GEntity<Button> Create(int x, int y, Action pressAction)
         {
-            Button button = new Button(x, y);
+            Button button = new Button(x, y, pressAction);
             button.DrawAction += button.Draw;
-            Entity entity = new Entity(button);
+            GEntity<Button> entity = new GEntity<Button>(button);
             entity.TickAction += button.Tick;
             return entity;
         }
