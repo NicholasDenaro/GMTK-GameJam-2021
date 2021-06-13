@@ -12,6 +12,7 @@ namespace Game
     {
         private Animation animation;
         public int Level { get; set; }
+        public int TotalLevel { get; set; }
         public int exp;
         public int damage;
         public int speed;
@@ -132,6 +133,7 @@ namespace Game
             {
                 this.exp -= ExpNeeded();
                 this.Level++;
+                this.TotalLevel++;
                 this.SkillPoints++;
                 Program.AddEntity(TextAnimation.Create(X, Y, "Level up!", Color.White, 15, Program.TPS, 0, -1));
             }
@@ -217,12 +219,12 @@ namespace Game
                     if (X < Program.ScreenWidth / 2)
                     {
                         animation = AnimationManager.Instance["left attack center"].CreateNew();
-                        Program.AddEntity(SpriteAnimation.Create(Target.X + Target.Width * 3 / 4, Target.Y + Target.Height / 2, Sprite.Sprites["slash"], new int[] { 2, 1, 3, 2, 1 }));
+                        Program.AddEntity(SpriteAnimation.Create(Target.X, Target.Y + Target.Height / 2, Sprite.Sprites["slash"], new int[] { 2, 1, 3, 2, 1 }));
                     }
                     else
                     {
                         animation = AnimationManager.Instance["right attack center"].CreateNew();
-                        Program.AddEntity(SpriteAnimation.Create(Target.X, Target.Y + Target.Height / 2, Sprite.Sprites["slash"], new int[] { 2, 1, 3, 2, 1 }));
+                        Program.AddEntity(SpriteAnimation.Create(Target.X + Target.Width * 3 / 4, Target.Y + Target.Height / 2, Sprite.Sprites["slash"], new int[] { 2, 1, 3, 2, 1 }));
                     }
                 }
             }

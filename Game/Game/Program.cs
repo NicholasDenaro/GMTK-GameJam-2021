@@ -76,6 +76,8 @@ namespace Game
 
         public static int NextTarget;
 
+        public const int RebirthLevel = 30;
+
         static void Main(string[] args)
         {
             var wbuilder = new AvaloniaWindowBuilder();
@@ -165,12 +167,12 @@ namespace Game
             GEntity<UIBar> leftHealth = UIBar.Create(8, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, left.Description.HealthPercentage);
             GEntity<UIBar> leftAttackTimer = UIBar.Create(20, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, left.Description.AttackPercentage);
             GEntity<UIBar> leftExp = UIBar.Create(8, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, left.Description.ExpPercentage);
-            GEntity<Counter> leftLevel = Counter.Create(8, ScreenHeight - 12 - 20, () => $"Level:{left.Description.Level},sp:{left.Description.SkillPoints}");
+            GEntity<Counter> leftLevel = Counter.Create(8, ScreenHeight - 12 - 20, () => $"Lv:{left.Description.TotalLevel},sp:{left.Description.SkillPoints}");
 
             GEntity<UIBar> rightHealth = UIBar.Create(ScreenWidth - 16, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, right.Description.HealthPercentage);
             GEntity<UIBar> rightAttackTimer = UIBar.Create(ScreenWidth - 28, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, right.Description.AttackPercentage);
             GEntity<UIBar> rightExp = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, right.Description.ExpPercentage);
-            GEntity<Counter> rightLevel = Counter.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12 - 20, () => $"Level:{right.Description.Level},sp:{right.Description.SkillPoints}");
+            GEntity<Counter> rightLevel = Counter.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12 - 20, () => $"Lv:{right.Description.TotalLevel},sp:{right.Description.SkillPoints}");
 
             Engine.TickEnd += (object sender, GameState state) =>
             {
@@ -179,6 +181,24 @@ namespace Game
                     Save();
                     GEntity<TextAnimation> ani = TextAnimation.Create(ScreenWidth / 3, ScreenHeight / 2, "Saved", Color.White, 30, TPS, 0, 0);
                     ani.Description.SetCoords(ScreenWidth / 2  - ani.Description.trueWidth / 2, ani.Description.Y);
+                    Program.AddEntity(ani);
+                }
+
+
+                if (!IsSplit && FurthestLevel > RebirthLevel && Program.Engine.Controllers.First()[(int)Program.Actions.RESTART].IsPress())
+                {
+                    JoinedLevel = 1;
+                    LeftLevel = 1;
+                    RightLevel = 1;
+                    left.Description.Level = 1;
+                    left.Description.exp = 0;
+                    right.Description.Level = 1;
+                    right.Description.exp = 0;
+                    FurthestLevel = 1;
+                    JoinTogether();
+                    Save();
+                    GEntity<TextAnimation> ani = TextAnimation.Create(ScreenWidth / 3, ScreenHeight / 2, "Rebirth", Color.White, 30, TPS, 0, 0);
+                    ani.Description.SetCoords(ScreenWidth / 2 - ani.Description.trueWidth / 2, ani.Description.Y);
                     Program.AddEntity(ani);
                 }
             };
@@ -347,8 +367,8 @@ namespace Game
 
             LeftLevel = JoinedLevel;
             RightLevel = JoinedLevel;
-            LeftLevelKills = JoinedLevelKills;
-            RightLevelKills = JoinedLevelKills;
+            ////LeftLevelKills = JoinedLevelKills;
+            ////RightLevelKills = JoinedLevelKills;
 
             left.Description.SetCoords(ScreenWidth / 4 - 24, ScreenHeight * 2 / 3 - 32);
             left.Description.SetDefaultPosition(ScreenWidth / 4 - 24, ScreenHeight * 2 / 3 - 32);
@@ -686,6 +706,13 @@ namespace Game
 
                 if (JoinedLevelKills >= 10 && autoProgress || (JoinedLevel % 10 == 0 && JoinedLevel == FurthestLevel))
                 {
+                    if (JoinedLevel == RebirthLevel)
+                    {
+                        GEntity<TextAnimation> ani = TextAnimation.Create(ScreenWidth / 3, ScreenHeight / 4, "Rebirth\nUnlocked", Color.White, 30, TPS * 2, 0, 0);
+                        ani.Description.SetCoords(ScreenWidth / 2 - ani.Description.trueWidth / 2, ani.Description.Y);
+                        Program.AddEntity(ani);
+                    }
+
                     JoinedLevelKills = 0;
                     JoinedLevel++;
                     FurthestLevel = JoinedLevel;
@@ -726,6 +753,7 @@ namespace Game
                 Left = new FighterData
                 {
                     Level = left.Description.Level,
+                    TotalLevel = left.Description.TotalLevel,
                     Exp = left.Description.exp,
                     SkillPoints = left.Description.SkillPoints,
                     MaxHealth = left.Description.maxHealth,
@@ -738,6 +766,7 @@ namespace Game
                 Right = new FighterData
                 {
                     Level = right.Description.Level,
+                    TotalLevel = right.Description.TotalLevel,
                     Exp = right.Description.exp,
                     SkillPoints = right.Description.SkillPoints,
                     MaxHealth = right.Description.maxHealth,
@@ -762,6 +791,7 @@ namespace Game
         public class FighterData
         {
             public int Level { get; set; }
+            public int TotalLevel { get; set; }
             public int Exp { get; set; }
             public int SkillPoints { get; set; }
             public int MaxHealth { get; set; }
@@ -805,6 +835,7 @@ namespace Game
                 Program.FurthestLevel = dat.FurthestLevel;
 
                 left.Description.Level = dat.Left.Level;
+                left.Description.TotalLevel = dat.Left.TotalLevel;
                 left.Description.exp = dat.Left.Exp;
                 left.Description.SkillPoints = dat.Left.SkillPoints;
                 left.Description.maxHealth = dat.Left.MaxHealth;
@@ -815,6 +846,7 @@ namespace Game
                 left.Description.hpHeal = dat.Left.HpHeal;
 
                 right.Description.Level = dat.Left.Level;
+                right.Description.TotalLevel = dat.Left.TotalLevel;
                 right.Description.exp = dat.Right.Exp;
                 right.Description.SkillPoints = dat.Right.SkillPoints;
                 right.Description.maxHealth = dat.Right.MaxHealth;
@@ -824,7 +856,7 @@ namespace Game
                 right.Description.attacks = dat.Right.Attacks;
                 right.Description.hpHeal = dat.Right.HpHeal;
 
-                if (left.Description.SkillPoints > 0 || right.Description.SkillPoints > 0)
+                if (left.Description.TotalLevel > 1 || right.Description.TotalLevel > 1)
                 {
                     ShowSkillButtons(false);
                     ShowSkillButtons(true);
@@ -835,14 +867,8 @@ namespace Game
         public static Dictionary<Avalonia.Input.Key, Actions> keyMap
             = new Dictionary<Avalonia.Input.Key, Actions>(new[]
             {
-                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.F2, Actions.DIAGS),
-                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Z, Actions.CANCEL),
-                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.R, Actions.RESTART),
+                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.R, Actions.RESTART),
                 new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.S, Actions.ACTION),
-                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Up, Actions.UP),
-                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Down, Actions.DOWN),
-                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Left, Actions.LEFT),
-                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Right, Actions.RIGHT),
             });
 
         public static Dictionary<Avalonia.Input.PointerUpdateKind, Actions> mouseMap
