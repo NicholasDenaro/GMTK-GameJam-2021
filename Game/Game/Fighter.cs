@@ -128,11 +128,11 @@ namespace Game
                 this.exp -= ExpNeeded();
                 this.Level++;
                 this.SkillPoints++;
-                Program.AddEntity(TextAnimation.Create(X, Y, "Level up!", Color.White, 15));
+                Program.AddEntity(TextAnimation.Create(X, Y, "Level up!", Color.White, 15, Program.TPS, 0, -1));
             }
             else
             {
-                Program.AddEntity(TextAnimation.Create(X + Width / 2, Y - 4, $"{exp}xp", Color.Yellow, 10));
+                Program.AddEntity(TextAnimation.Create(X + Width / 2, Y - 4, $"{exp}xp", Color.Yellow, 10, Program.TPS, 0.5f, -1));
             }
         }
 
@@ -225,11 +225,12 @@ namespace Game
             int x = (int)enemy.X + enemy.Width / 2 + Program.Random.Next(-16, 16);
             int y = (int)enemy.Y - 4 + Program.Random.Next(-4, 4);
 
-            int damage = manualAttack ? Math.Max(1, this.damage / 5) : this.damage;
+            int damage = manualAttack ? (1 + this.damage / 5) : this.damage;
             bool killed = false;
+
             for (int i = 0; i < (manualAttack ? 1 : attacks); i++)
             {
-                Program.AddEntity(TextAnimation.Create(x, y, "" + damage, Color.White, 15));
+                Program.AddEntity(TextAnimation.Create(x, y, "" + damage, Color.White, 15, 8, 1.5f, -4));
                 x += 3;
                 y -= 8;
                 killed |= enemy.Damage(damage);
