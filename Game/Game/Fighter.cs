@@ -207,6 +207,8 @@ namespace Game
                 return false;
             }
 
+            SoundManager.Play(Program.slashSound);
+
             if (!manualAttack)
             {
                 if (Program.IsSplit)

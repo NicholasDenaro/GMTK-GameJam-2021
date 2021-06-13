@@ -83,6 +83,8 @@ namespace Game
 
         public static MML[] backgroundMusic;
 
+        public static MML slashSound;
+
         static void Main(string[] args)
         {
             var wbuilder = new AvaloniaWindowBuilder();
@@ -149,10 +151,20 @@ namespace Game
 
             MML saveMML = new MML(">>c32d32e8");
 
+            slashSound = new MML(
+                "<b32",
+                "<r32a32",
+                "<r16g32"
+                );
+
             MML forrestMML = new MML(
-                "<<c4f8e8g4f8e8g" +
-                "c4f8e8f8d4e8f8d2" +
-                "c2a2f2c8d&d2c2g2f4c8d2a8b8g&g2");
+                "<g b+2e-4>d+4 < d g" +
+                "<d- e4>d4<b2 g-  >c-" +
+                "<f c >a< g",
+
+                "<<f2g2 c b2d2 e",
+
+                "<<f c b e");
 
             MML cavesMML = new MML(
                 "<<<e-4b+2>d+4<gd>c" +
@@ -160,11 +172,11 @@ namespace Game
                 "",
 
                 "<<<<f8g8f8g8f8g8f8g8"+
-                    "g8b-8g8b-8g8b-8g8b-8");
+                    "g8b-8g8b-8g8b-8g8b-8",
+                
+                "<<<<f g");
 
             backgroundMusic = new[] { grasslandsMML, forrestMML, cavesMML };
-
-            SoundManager.PlayLoopedMML(cavesMML);
 
             Engine.SetLocation(new Location(new Description2D(0, 0, ScreenWidth, ScreenHeight)));
 
@@ -194,6 +206,8 @@ namespace Game
             right = Fighter.Create(ScreenWidth / 2 + 16, ScreenHeight * 2 / 3 - 32, Sprite.Sprites["fighter2"]);
 
             Load();
+
+            SoundManager.PlayLoopedMML(Program.backgroundMusic[((-1 + JoinedLevel) / 10) % 3]);
 
             GEntity<UIBar> leftHealth = UIBar.Create(8, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, left.Description.HealthPercentage);
             GEntity<UIBar> leftAttackTimer = UIBar.Create(20, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, left.Description.AttackPercentage);
@@ -573,8 +587,15 @@ namespace Game
                     JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
                 }
 
+                int prevIndex = LeftBackground.Description.ImageIndex;
                 LeftBackground.Description.ImageIndex = ((-1 + LeftLevel) / 10) % 3;
                 LeftBackgroundColor.Description.background = ((-1 + LeftLevel) / 10) % 3;
+
+                if (prevIndex != LeftBackground.Description.ImageIndex)
+                {
+                    SoundManager.Clear();
+                    SoundManager.PlayLoopedMML(Program.backgroundMusic[LeftBackground.Description.ImageIndex]);
+                }
 
             }
             else if (screen == 2)
@@ -605,8 +626,16 @@ namespace Game
                     JoinedEnemy.Description.DrawAction = Program.invisible;
                     JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
                 }
+
+                int prevIndex = RightBackground.Description.ImageIndex;
                 RightBackground.Description.ImageIndex = ((-1 + RightLevel) / 10) % 3;
                 RightBackgroundColor.Description.background = ((-1 + RightLevel) / 10) % 3;
+
+                if (prevIndex != RightBackground.Description.ImageIndex)
+                {
+                    SoundManager.Clear();
+                    SoundManager.PlayLoopedMML(Program.backgroundMusic[RightBackground.Description.ImageIndex]);
+                }
             }
             else
             {
@@ -638,8 +667,15 @@ namespace Game
                     RightEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
                 }
 
+                int prevIndex = JoinedBackground.Description.ImageIndex;
                 JoinedBackground.Description.ImageIndex = ((-1 + JoinedLevel) / 10) % 3;
                 JoinedBackgroundColor.Description.background = ((-1 + JoinedLevel) / 10) % 3;
+
+                if (prevIndex != JoinedBackground.Description.ImageIndex)
+                {
+                    SoundManager.Clear();
+                    SoundManager.PlayLoopedMML(Program.backgroundMusic[JoinedBackground.Description.ImageIndex]);
+                }
             }
         }
 
