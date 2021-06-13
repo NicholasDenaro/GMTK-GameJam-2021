@@ -18,7 +18,7 @@ namespace Game
         private int attacks;
         private float hpHeal;
         private int maxHealth;
-        public int Health { get; private set; }
+        public float Health { get; private set; }
 
         public int SkillPoints { get; private set; }
 
@@ -44,7 +44,7 @@ namespace Game
             attacks = 1;
             hpHeal = 0;
             Health = 10;
-            maxHealth = Health;
+            maxHealth = (int)Health;
             ResetAttackTimer();
             bmp = BitmapExtensions.CreateBitmap(48, 64);
             gfx = Graphics.FromImage(bmp);
@@ -79,7 +79,7 @@ namespace Game
             if (this.SkillPoints > 0)
             {
                 this.maxHealth = (int)(this.maxHealth * 1.25);
-                this.hpHeal += 0.2f;
+                this.hpHeal += 0.2f / Program.TPS;
                 this.SkillPoints--;
             }
         }
@@ -159,7 +159,7 @@ namespace Game
 
             if (Health < maxHealth)
             {
-                Health += (int)hpHeal;
+                Health += hpHeal;
                 
                 if (Health > maxHealth)
                 {
@@ -228,9 +228,10 @@ namespace Game
             int damage = manualAttack ? (1 + this.damage / 5) : this.damage;
             bool killed = false;
 
+            Color color = manualAttack ? Color.White : (X < Program.ScreenWidth / 2) ? Color.LawnGreen : Color.Red;
             for (int i = 0; i < (manualAttack ? 1 : attacks); i++)
             {
-                Program.AddEntity(TextAnimation.Create(x, y, "" + damage, Color.White, 15, 8, 1.5f, -4));
+                Program.AddEntity(TextAnimation.Create(x, y, "" + damage, color, 15, 8, 1.5f, -4));
                 x += 3;
                 y -= 8;
                 killed |= enemy.Damage(damage);
