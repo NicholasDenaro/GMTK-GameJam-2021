@@ -39,9 +39,12 @@ namespace Game
         private static GEntity<Button> PreviousLevelButton;
         private static GEntity<Button> NextLevelButton;
 
-        private static GEntity<Description2D> JoinedBackground;
-        private static GEntity<Description2D> LeftBackground;
-        private static GEntity<Description2D> RightBackground;
+        private static GEntity<BackgroundColor> JoinedBackgroundColor;
+        private static GEntity<BackgroundColor> LeftBackgroundColor;
+        private static GEntity<BackgroundColor> RightBackgroundColor;
+        private static GEntity<Background> JoinedBackground;
+        private static GEntity<Background> LeftBackground;
+        private static GEntity<Background> RightBackground;
 
         private static GEntity<Enemy> JoinedEnemy;
         private static GEntity<Enemy> LeftEnemy;
@@ -87,12 +90,23 @@ namespace Game
             GameFrame frame = builder.Frame;
 
             new Sprite("text", 0, 0);
-            new Sprite("grasslands", "Resources/Backgrounds/grassland.PNG", 320, 160);
-            new Sprite("grasslands2", "Resources/Backgrounds/grassland2.PNG", 160, 160);
+
+            new Sprite("joinedbackgrounds", "Resources/Backgrounds/joinedbackgrounds.PNG", 320, 160);
+            new Sprite("halfbackgrounds", "Resources/Backgrounds/halfbackgrounds.PNG", 160, 160);
+
             new Sprite("chicken", "Resources/mobs/chicken.png", 64, 64);
             new Sprite("pig", "Resources/mobs/pig.png", 64, 64);
             new Sprite("sheep", "Resources/mobs/sheep.png", 64, 64);
             new Sprite("ox", "Resources/mobs/ox.png", 64, 64);
+
+            new Sprite("wolf", "Resources/mobs/grey wolf.png", 64, 64);
+            new Sprite("bear", "Resources/mobs/bear.png", 64, 64);
+            new Sprite("spider", "Resources/mobs/spider.png", 64, 64);
+
+            new Sprite("golem", "Resources/mobs/golem.png", 64, 64);
+            new Sprite("bat", "Resources/mobs/bat.png", 64, 64);
+            new Sprite("zombie", "Resources/mobs/ash_zombie.png", 64, 64);
+
             new Sprite("fighter1", "Resources/Characters/leftCharacter.png", 39, 64);
             new Sprite("fighter2", "Resources/Characters/rightCharacter.png", 43, 64);
             new Sprite("attackbutton", "Resources/UI/attackButton.png", 64, 48);
@@ -117,10 +131,19 @@ namespace Game
 
             Engine.SetLocation(new Location(new Description2D(0, 0, ScreenWidth, ScreenHeight)));
 
-            JoinedBackground = new GEntity<Description2D>(new Description2D(Sprite.Sprites["grasslands"], 0, 80));
-            LeftBackground = new GEntity<Description2D>(new Description2D(Sprite.Sprites["grasslands2"], 0, 80));
-            RightBackground = new GEntity<Description2D>(new Description2D(Sprite.Sprites["grasslands2"], 160, 80));
+            Color[] bgColors = new[] { Color.SkyBlue, Color.ForestGreen, Color.FromArgb(255, 30, 25, 10) };
 
+            JoinedBackgroundColor = new GEntity<BackgroundColor>(new BackgroundColor(0, 0, ScreenWidth, ScreenHeight, bgColors));
+            LeftBackgroundColor = new GEntity<BackgroundColor>(new BackgroundColor(0, 0, ScreenWidth, ScreenHeight, bgColors));
+            RightBackgroundColor = new GEntity<BackgroundColor>(new BackgroundColor(0, 0, ScreenWidth, ScreenHeight, bgColors));
+
+            JoinedBackground = Background.Create(Sprite.Sprites["joinedbackgrounds"], 0, 80);
+            LeftBackground = Background.Create(Sprite.Sprites["halfbackgrounds"], 0, 80);
+            RightBackground = Background.Create(Sprite.Sprites["halfbackgrounds"], 160, 80);
+
+            Program.AddEntity(JoinedBackgroundColor);
+            Program.AddEntity(LeftBackgroundColor);
+            Program.AddEntity(RightBackgroundColor);
             Program.AddEntity(JoinedBackground);
             Program.AddEntity(LeftBackground);
             Program.AddEntity(RightBackground);
@@ -143,16 +166,15 @@ namespace Game
             GEntity<UIBar> rightExp = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, right.Description.ExpPercentage);
             GEntity<Counter> rightLevel = Counter.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12 - 20, () => $"Level:{right.Description.Level},sp:{right.Description.SkillPoints}");
 
-            // Devtool
+
             Engine.TickEnd += (object sender, GameState state) =>
             {
                 if (Program.Engine.Controllers.First()[(int)Program.Actions.ACTION].IsPress())
                 {
-                    JoinTogether();
-                }
-                if (Program.Engine.Controllers.First()[(int)Program.Actions.CANCEL].IsPress())
-                {
-                    Splitup();
+                    Save();
+                    GEntity<TextAnimation> ani = TextAnimation.Create(ScreenWidth / 3, ScreenHeight / 2, "Saved", Color.White, 30, TPS, 0, 0);
+                    ani.Description.SetCoords(ScreenWidth / 2  - ani.Description.trueWidth / 2, ani.Description.Y);
+                    Program.AddEntity(ani);
                 }
             };
 
@@ -177,6 +199,11 @@ namespace Game
             Program.AddEntity(rightAttackTimer);
             Program.AddEntity(rightExp);
             Program.AddEntity(rightLevel);
+
+            if (JoinedLevel > 1)
+            {
+                ShowPreviousButton();
+            }
 
             while (true) { }
         }
@@ -207,35 +234,43 @@ namespace Game
                         JoinedLevel++;
                         LeftLevel = JoinedLevel;
                         RightLevel = JoinedLevel;
-                        if (JoinedLevel % 10 == 0)
+
+                        ShowPreviousButton();
+                        if (IsSplit)
+                        {
+                            SummonEnemy(1);
+                            SummonEnemy(2);
+                        }
+                        else
+                        {
+                            SummonEnemy(0);
+                        }
+
+                        if (JoinedLevel == FurthestLevel)
+                        {
+                            autoProgress = true;
+                            NextLevelButton.Description.DrawAction = Program.invisible;
+                        }
+
+                        if (JoinedLevel % 10 == 0 && JoinedLevel == FurthestLevel)
                         {
                             JoinTogether();
-                            autoProgress = true;
                         }
                     }
                     else
                     {
+                        // dead code?
                         autoProgress = true;
                     }
                 }, 3, Sprite.Sprites["rightArrow"]);
                 Program.Engine.AddEntity(NextLevelButton);
             }
+
+            NextLevelButton.Description.DrawAction -= Program.invisible;
         }
 
-        public static void Splitup()
+        public static void ShowPreviousButton()
         {
-            IsSplit = true;
-            LeftBackground.Description.DrawAction -= invisible;
-            RightBackground.Description.DrawAction -= invisible;
-            JoinedBackground.Description.DrawAction = invisible;
-            if (JoinedLevel % 10 == 0)
-            {
-                JoinedLevel--;
-                autoProgress = false;
-
-                ShowNextLevelButton();
-            }
-
             if (PreviousLevelButton == null)
             {
                 PreviousLevelButton = Button.Create(0, 0, Color.Wheat, () => {
@@ -245,10 +280,10 @@ namespace Game
                         LeftLevel = JoinedLevel;
                         RightLevel = JoinedLevel;
 
-                        if (JoinedLevel % 10 == 0)
-                        {
-                            JoinTogether();
-                        }
+                        ////if (JoinedLevel % 10 == 0)
+                        ////{
+                        ////    JoinTogether();
+                        ////}
 
                         autoProgress = false;
 
@@ -263,10 +298,40 @@ namespace Game
                         }
 
                         ShowNextLevelButton();
+
+                        if (JoinedLevel == 1)
+                        {
+                            PreviousLevelButton.Description.DrawAction = Program.invisible;
+                        }
                     }
                 }, 3, Sprite.Sprites["leftArrow"]);
                 Program.AddEntity(PreviousLevelButton);
             }
+
+            PreviousLevelButton.Description.DrawAction -= Program.invisible;
+        }
+
+        public static void Splitup()
+        {
+            IsSplit = true;
+            LeftBackground.Description.DrawAction -= invisible;
+            LeftBackgroundColor.Description.DrawAction = LeftBackgroundColor.Description.Draw;
+
+            RightBackground.Description.DrawAction -= invisible;
+            RightBackgroundColor.Description.DrawAction = RightBackgroundColor.Description.Draw;
+
+            JoinedBackground.Description.DrawAction = invisible;
+            JoinedBackgroundColor.Description.DrawAction = invisible;
+            if (JoinedLevel % 10 == 0)
+            {
+                JoinedLevel--;
+                autoProgress = false;
+
+                ShowNextLevelButton();
+                NextLevelButton.Description.DrawAction -= Program.invisible;
+            }
+
+            ShowPreviousButton();
 
             LeftLevel = JoinedLevel;
             RightLevel = JoinedLevel;
@@ -281,15 +346,11 @@ namespace Game
             right.Description.SetDefaultPosition(ScreenWidth * 3 / 4 - 24, ScreenHeight * 2 / 3 - 32);
             right.Description.screen = 2;
 
-            ////if (joinedButton != null)
-            ////{
-            ////    Engine.Location.RemoveEntity(joinedButton.Id);
-            ////    Engine.Location.RemoveEntity(joinedProgress.Id);
-            ////}
-
-            joinedButton.Description.DrawAction = Program.invisible;
-            joinedProgress.Description.DrawAction = Program.invisible;
-
+            if (joinedButton != null)
+            {
+                joinedButton.Description.DrawAction = Program.invisible;
+                joinedProgress.Description.DrawAction = Program.invisible;
+            }
 
             if (leftButton == null)
             {
@@ -307,18 +368,8 @@ namespace Game
                 Program.AddEntity(rightProgress);
             }
 
-            //RemoveEnemies();
-
             SummonEnemy(1);
             SummonEnemy(2);
-
-            ////if (!Engine.Location.Entities.Contains(leftButton))
-            ////{
-            ////    Program.AddEntity(leftButton);
-            ////    Program.AddEntity(rightButton);
-            ////    Program.AddEntity(leftProgress);
-            ////    Program.AddEntity(rightProgress);
-            ////}
 
             leftButton.Description.DrawAction = null;
             rightButton.Description.DrawAction = null;
@@ -338,23 +389,25 @@ namespace Game
             left.Description.screen = 0;
             right.Description.screen = 0;
 
+            left.Description.FullHeal();
+            right.Description.FullHeal();
+
             LeftBackground.Description.DrawAction = invisible;
+            LeftBackgroundColor.Description.DrawAction = invisible;
+
             RightBackground.Description.DrawAction = invisible;
+            RightBackgroundColor.Description.DrawAction = invisible;
+
             JoinedBackground.Description.DrawAction -= invisible;
+            JoinedBackgroundColor.Description.DrawAction = JoinedBackgroundColor.Description.Draw;
 
             if (leftButton != null)
             {
-                //Program.RemoveEntity(leftButton);
-                //Program.RemoveEntity(leftProgress);
-
                 leftButton.Description.DrawAction = Program.invisible;
                 leftProgress.Description.DrawAction = Program.invisible;
             }
             if (rightButton != null)
             {
-                //Program.RemoveEntity(rightButton);
-                //Program.RemoveEntity(rightProgress);
-
                 rightButton.Description.DrawAction = Program.invisible;
                 rightProgress.Description.DrawAction = Program.invisible;
             }
@@ -374,36 +427,11 @@ namespace Game
                 Program.AddEntity(joinedProgress);
             }
 
-            //RemoveEnemies();
-
             SummonEnemy(0);
-
-            ////if (!Engine.Location.Entities.Contains(joinedButton))
-            ////{
-            ////    Program.AddEntity(joinedButton);
-            ////    Program.AddEntity(joinedProgress);
-            ////}
 
             joinedButton.Description.DrawAction = null;
             joinedProgress.Description.DrawAction = joinedProgress.Description.Draw;
         }
-
-        ////private static void RemoveEnemies(Func<GEntity<Enemy>, bool> filter = null)
-        ////{
-        ////    if (filter == null)
-        ////    {
-        ////        filter = _ => true;
-        ////    }
-        ////    foreach (GEntity<Enemy> enemy in enemies)
-        ////    {
-        ////        if (filter(enemy))
-        ////        {
-        ////            enemy.Description.Destroy();
-        ////        }
-        ////    }
-
-        ////    enemies.RemoveAll((e) => filter(e));
-        ////}
 
         private static List<Sprite> enemySpriteList;
         public static Sprite GetEnemySprite()
@@ -417,13 +445,31 @@ namespace Game
                     Sprite.Sprites["pig"],
                     Sprite.Sprites["sheep"],
                     Sprite.Sprites["ox"],
+
+                    Sprite.Sprites["wolf"],
+                    Sprite.Sprites["bear"],
+                    Sprite.Sprites["spider"],
+
+                    Sprite.Sprites["golem"],
+                    Sprite.Sprites["bat"],
+                    Sprite.Sprites["zombie"],
                 });
             }
 
-            if (((JoinedLevel - 1) / 10) % 4 == 0)
+            if (((JoinedLevel - 1) / 10) % 3 == 0)
             {
                 min = 0;
                 max = 4;
+            }
+            if (((JoinedLevel - 1) / 10) % 3 == 1)
+            {
+                min = 4;
+                max = 7;
+            }
+            if (((JoinedLevel - 1) / 10) % 3 == 2)
+            {
+                min = 7;
+                max = 10;
             }
 
             return enemySpriteList[Program.Random.Next(min, max)];
@@ -431,7 +477,6 @@ namespace Game
 
         public static void SummonEnemy(int screen)
         {
-            //GEntity<Enemy> enemy;
             GEntity<UIBar> enemyHealth;
             if (screen == 1)
             {
@@ -456,8 +501,14 @@ namespace Game
                 left.Description.Target = LeftEnemy.Description;
                 LeftEnemy.Description.SetTargets(left.Description);
 
-                JoinedEnemy.Description.DrawAction = Program.invisible;
-                JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
+                if (JoinedEnemy != null)
+                {
+                    JoinedEnemy.Description.DrawAction = Program.invisible;
+                    JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
+                }
+
+                LeftBackground.Description.ImageIndex = ((-1 + LeftLevel) / 10) % 3;
+                LeftBackgroundColor.Description.background = ((-1 + LeftLevel) / 10) % 3;
 
             }
             else if (screen == 2)
@@ -483,8 +534,13 @@ namespace Game
                 right.Description.Target = RightEnemy.Description;
                 RightEnemy.Description.SetTargets(right.Description);
 
-                JoinedEnemy.Description.DrawAction = Program.invisible;
-                JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
+                if (JoinedEnemy != null)
+                {
+                    JoinedEnemy.Description.DrawAction = Program.invisible;
+                    JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
+                }
+                RightBackground.Description.ImageIndex = ((-1 + RightLevel) / 10) % 3;
+                RightBackgroundColor.Description.background = ((-1 + RightLevel) / 10) % 3;
             }
             else
             {
@@ -515,14 +571,10 @@ namespace Game
                     RightEnemy.Description.DrawAction = Program.invisible;
                     RightEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
                 }
+
+                JoinedBackground.Description.ImageIndex = ((-1 + JoinedLevel) / 10) % 3;
+                JoinedBackgroundColor.Description.background = ((-1 + JoinedLevel) / 10) % 3;
             }
-            //RemoveEnemies((e) => e.Description.screen == screen);
-
-            //Program.AddEntity(enemy);
-            //enemies.Add(enemy);
-
-            //enemy.Description.HealthBar = enemyHealth;
-            //Program.AddEntity(enemyHealth);
         }
 
         public static void GiveExp(int screen, int exp)
@@ -599,16 +651,26 @@ namespace Game
         {
             if (screen == 1)
             {
-                LeftLevelKills++;
+                if (LeftLevel == FurthestLevel)
+                {
+                    LeftLevelKills++;
+                }
             }
             else if (screen == 2)
             {
-                RightLevelKills++;
+                if (RightLevel == FurthestLevel)
+                {
+                    RightLevelKills++;
+                }
             }
             else
             {
-                JoinedLevelKills++;
-                if (JoinedLevelKills >= 10 && autoProgress || JoinedLevel % 10 == 0)
+                if (JoinedLevel == FurthestLevel)
+                {
+                    JoinedLevelKills++;
+                }
+
+                if (JoinedLevelKills >= 10 && autoProgress || (JoinedLevel % 10 == 0 && JoinedLevel == FurthestLevel))
                 {
                     JoinedLevelKills = 0;
                     JoinedLevel++;
@@ -625,7 +687,15 @@ namespace Game
                     FurthestLevel = JoinedLevel;
                 }
 
-                JoinTogether();
+                if (JoinedLevel == FurthestLevel)
+                {
+                    JoinTogether();
+                }
+            }
+
+            if (JoinedLevel > 1)
+            {
+                ShowPreviousButton();
             }
         }
 

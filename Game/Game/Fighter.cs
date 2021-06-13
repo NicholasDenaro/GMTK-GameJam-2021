@@ -51,6 +51,11 @@ namespace Game
             gfx.FillRectangle(Brushes.OrangeRed, 0, 0, 48, 64);
         }
 
+        public void FullHeal()
+        {
+            Health = maxHealth;
+        }
+
         public void UpgradeDamage()
         {
             if (this.SkillPoints > 0)

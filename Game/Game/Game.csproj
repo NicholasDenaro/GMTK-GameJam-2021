@@ -6,12 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Backgrounds\caves.PNG" />
-    <None Remove="Resources\Backgrounds\caves2.PNG" />
-    <None Remove="Resources\Backgrounds\forrest.PNG" />
-    <None Remove="Resources\Backgrounds\forrest2.PNG" />
-    <None Remove="Resources\Backgrounds\grassland.PNG" />
-    <None Remove="Resources\Backgrounds\grassland2.PNG" />
+    <None Remove="Resources\Backgrounds\halfbackgrounds.PNG" />
+    <None Remove="Resources\Backgrounds\joinedbackgrounds.PNG" />
     <None Remove="Resources\Characters\leftCharacter.png" />
     <None Remove="Resources\Characters\rightCharacter.png" />
     <None Remove="Resources\mobs\ash_zombie.png" />
@@ -42,12 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Backgrounds\caves.PNG" />
-    <EmbeddedResource Include="Resources\Backgrounds\caves2.PNG" />
-    <EmbeddedResource Include="Resources\Backgrounds\forrest.PNG" />
-    <EmbeddedResource Include="Resources\Backgrounds\forrest2.PNG" />
-    <EmbeddedResource Include="Resources\Backgrounds\grassland.PNG" />
-    <EmbeddedResource Include="Resources\Backgrounds\grassland2.PNG" />
+    <EmbeddedResource Include="Resources\Backgrounds\halfbackgrounds.PNG" />
+    <EmbeddedResource Include="Resources\Backgrounds\joinedbackgrounds.PNG" />
     <EmbeddedResource Include="Resources\Characters\leftCharacter.png" />
     <EmbeddedResource Include="Resources\Characters\rightCharacter.png" />
     <EmbeddedResource Include="Resources\mobs\ash_zombie.png" />

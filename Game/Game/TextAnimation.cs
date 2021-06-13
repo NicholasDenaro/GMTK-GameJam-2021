@@ -22,15 +22,29 @@ namespace Game
         private float dx;
         private float dy;
 
-        private TextAnimation(int x, int y, string text, Color color, int size, int duration, float dx, float dy) : base(Sprite.Sprites["text"], x: x, y: y, 100, 50)
+        public int trueWidth;
+        public int trueHeight;
+
+        public override Rectangle Bounds => new Rectangle(new Point((int)X, (int)Y), new Size(trueWidth, Height));
+
+        private TextAnimation(int x, int y, string text, Color color, int size, int duration, float dx, float dy)
+            : base(Sprite.Sprites["text"], x: x, y: y, 
+                  (int)Graphics.FromImage(new Bitmap(1, 1)).MeasureString(text, new Font("Arial", size)).Width,
+                  (int)Graphics.FromImage(new Bitmap(1, 1)).MeasureString(text, new Font("Arial", size)).Height)
         {
             this.text = text;
             this.color = color;
             this.font = new Font("Arial", size);
-            bmp = BitmapExtensions.CreateBitmap(100, 50);
+
+            using Graphics g = Graphics.FromImage(new Bitmap(1,1));
+            trueWidth = (int)g.MeasureString(text, this.font).Width;
+            trueHeight = (int)g.MeasureString(text, this.font).Height;
+
+            bmp = BitmapExtensions.CreateBitmap(trueWidth, trueHeight);
             bmp.MakeTransparent();
             gfx = Graphics.FromImage(bmp);
             gfx.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            
             this.duration = duration;
             this.dx = dx;
             this.dy = dy;
@@ -39,8 +53,6 @@ namespace Game
 
         private void Tick(Location location, Entity entity)
         {
-            //this.ChangeCoordsDelta((time % 4 == 0) ? 1 : 0, -1);
-            //this.ChangeCoordsDelta(1.5 , -4);
             this.ChangeCoordsDelta(dx, dy);
             if (--time <= 0)
             {
