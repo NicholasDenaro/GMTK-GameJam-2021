@@ -24,6 +24,11 @@ namespace Game
 
         private void Tick(Location location, Entity entity)
         {
+            if (timings[index] == -1)
+            {
+                return;
+            }
+
             ImageIndex = index;
 
             ticks++;

@@ -50,6 +50,8 @@ namespace Game
         private static GEntity<Enemy> LeftEnemy;
         private static GEntity<Enemy> RightEnemy;
 
+        private static GEntity<SpriteAnimation> ScreenSplitter;
+
         //private static List<GEntity<Enemy>> enemies = new List<GEntity<Enemy>>();
 
         public static bool IsSplit { get; private set; }
@@ -125,6 +127,8 @@ namespace Game
             new Sprite("skillSpeed", "Resources/UI/skillSp.png", 16, 16);
             new Sprite("slash", "Resources/UI/slash.png", 45, 38);
 
+            new Sprite("split", "Resources/UI/split.PNG", 18, 240);
+
             new Animation("left attack center", TPS / 2, null, null, Fighter.AniLeftAttackCenter, Fighter.AniResetPosition);
             new Animation("right attack center", TPS / 2, null, null, Fighter.AniRightAttackCenter, Fighter.AniResetPosition);
             new Animation("attack", TPS / 2, null, null, Fighter.AniAttack, Fighter.AniResetPosition);
@@ -148,8 +152,10 @@ namespace Game
             Program.AddEntity(LeftBackground);
             Program.AddEntity(RightBackground);
 
-            Engine.Start();
+            ScreenSplitter = SpriteAnimation.Create(ScreenWidth / 2 - 9, 0, Sprite.Sprites["split"], new int[] { -1 });
+            Program.AddEntity(ScreenSplitter);
 
+            Engine.Start();
 
             left = Fighter.Create(ScreenWidth / 2 - 64, ScreenHeight * 2 / 3 - 32, Sprite.Sprites["fighter1"]);
             right = Fighter.Create(ScreenWidth / 2 + 16, ScreenHeight * 2 / 3 - 32, Sprite.Sprites["fighter2"]);
@@ -165,7 +171,6 @@ namespace Game
             GEntity<UIBar> rightAttackTimer = UIBar.Create(ScreenWidth - 28, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, right.Description.AttackPercentage);
             GEntity<UIBar> rightExp = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, right.Description.ExpPercentage);
             GEntity<Counter> rightLevel = Counter.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12 - 20, () => $"Level:{right.Description.Level},sp:{right.Description.SkillPoints}");
-
 
             Engine.TickEnd += (object sender, GameState state) =>
             {
@@ -202,7 +207,12 @@ namespace Game
 
             if (JoinedLevel > 1)
             {
-                ShowPreviousButton();
+                ShowPreviousLevelButton();
+            }
+
+            if (JoinedLevel < FurthestLevel)
+            {
+                ShowNextLevelButton();
             }
 
             while (true) { }
@@ -235,7 +245,7 @@ namespace Game
                         LeftLevel = JoinedLevel;
                         RightLevel = JoinedLevel;
 
-                        ShowPreviousButton();
+                        ShowPreviousLevelButton();
                         if (IsSplit)
                         {
                             SummonEnemy(1);
@@ -269,7 +279,7 @@ namespace Game
             NextLevelButton.Description.DrawAction -= Program.invisible;
         }
 
-        public static void ShowPreviousButton()
+        public static void ShowPreviousLevelButton()
         {
             if (PreviousLevelButton == null)
             {
@@ -313,6 +323,8 @@ namespace Game
 
         public static void Splitup()
         {
+            ScreenSplitter.Description.DrawAction -= Program.invisible;
+
             IsSplit = true;
             LeftBackground.Description.DrawAction -= invisible;
             LeftBackgroundColor.Description.DrawAction = LeftBackgroundColor.Description.Draw;
@@ -331,7 +343,7 @@ namespace Game
                 NextLevelButton.Description.DrawAction -= Program.invisible;
             }
 
-            ShowPreviousButton();
+            ShowPreviousLevelButton();
 
             LeftLevel = JoinedLevel;
             RightLevel = JoinedLevel;
@@ -379,6 +391,8 @@ namespace Game
         
         public static void JoinTogether()
         {
+            ScreenSplitter.Description.DrawAction = Program.invisible;
+
             IsSplit = false;
             LeftLevelKills = 0;
             RightLevelKills = 0;
@@ -695,7 +709,7 @@ namespace Game
 
             if (JoinedLevel > 1)
             {
-                ShowPreviousButton();
+                ShowPreviousLevelButton();
             }
         }
 
@@ -821,14 +835,14 @@ namespace Game
         public static Dictionary<Avalonia.Input.Key, Actions> keyMap
             = new Dictionary<Avalonia.Input.Key, Actions>(new[]
             {
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.F2, Actions.DIAGS),
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Z, Actions.CANCEL),
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.R, Actions.RESTART),
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.X, Actions.ACTION),
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Up, Actions.UP),
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Down, Actions.DOWN),
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Left, Actions.LEFT),
-                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Right, Actions.RIGHT),
+                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.F2, Actions.DIAGS),
+                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Z, Actions.CANCEL),
+                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.R, Actions.RESTART),
+                new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.S, Actions.ACTION),
+                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Up, Actions.UP),
+                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Down, Actions.DOWN),
+                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Left, Actions.LEFT),
+                ////new KeyValuePair<Avalonia.Input.Key, Actions>(Avalonia.Input.Key.Right, Actions.RIGHT),
             });
 
         public static Dictionary<Avalonia.Input.PointerUpdateKind, Actions> mouseMap

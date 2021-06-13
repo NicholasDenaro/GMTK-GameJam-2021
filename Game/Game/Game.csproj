@@ -35,6 +35,7 @@
     <None Remove="Resources\UI\skillStr.png" />
     <None Remove="Resources\UI\skull_01.png" />
     <None Remove="Resources\UI\slash.png" />
+    <None Remove="Resources\UI\split.PNG" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +68,7 @@
     <EmbeddedResource Include="Resources\UI\skillStr.png" />
     <EmbeddedResource Include="Resources\UI\skull_01.png" />
     <EmbeddedResource Include="Resources\UI\slash.png" />
+    <EmbeddedResource Include="Resources\UI\split.PNG" />
   </ItemGroup>
 
   <ItemGroup>
