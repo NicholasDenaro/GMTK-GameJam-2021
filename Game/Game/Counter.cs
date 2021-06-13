@@ -15,7 +15,7 @@ namespace Game
         Bitmap bmp;
         Graphics gfx;
 
-        private Counter(int x, int y, Func<string> value) : base(Sprite.Sprites["plank"], x: x, y: y, 100, 20)
+        private Counter(int x, int y, Func<string> value) : base(Sprite.Sprites["plank"], x: x, y: y, 112, 20)
         {
             this.value = value;
             bmp = BitmapExtensions.CreateBitmap(Program.ScreenWidth, Program.ScreenHeight);

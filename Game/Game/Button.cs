@@ -17,7 +17,7 @@ namespace Game
         private bool isDown;
 
         private Button(int x, int y, Color color, Action pressAction, int scaleDown, Sprite sprite)
-            : base(sprite, x, y, 64 / scaleDown, 48 / scaleDown)
+            : base(sprite ?? Sprite.Sprites["text"], x, y, sprite == null ? 64 / scaleDown : sprite.Width, sprite == null ? 48 / scaleDown : sprite.Height)
         {
             this.pressAction = pressAction;
             bitmapUp = BitmapExtensions.CreateBitmap(64 / scaleDown, 48 / scaleDown);
@@ -63,7 +63,7 @@ namespace Game
 
         public static GEntity<Button> Create(int x, int y, Color color, Action pressAction, int scaleDown = 1, Sprite sprite = null)
         {
-            Button button = new Button(x, y, color, pressAction, scaleDown, sprite ?? Sprite.Sprites["text"]);
+            Button button = new Button(x, y, color, pressAction, scaleDown, sprite);
             if (sprite == null)
             {
                 button.DrawAction += button.Draw;

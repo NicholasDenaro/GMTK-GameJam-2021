@@ -1,5 +1,6 @@
 ﻿using GameEngine;
 using GameEngine._2D;
+using GameEngine.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,6 +10,7 @@ namespace Game
 {
     class Fighter : Description2D, IAttacker
     {
+        private Animation animation;
         public int Level { get; private set; }
         private int exp;
         private int damage;
@@ -29,6 +31,8 @@ namespace Game
         public int screen;
 
         public static readonly float SecondsPerAttack = 2.0f;
+
+        private Point defaultPosition;
 
         private Fighter(int x, int y, Sprite sprite) : base(sprite, x: x, y: y, 48, 64)
         {
@@ -79,7 +83,7 @@ namespace Game
 
         private int TickTimeForAttack()
         {
-            return (int)(Program.TPS * SecondsPerAttack / (speed * 0.5f));
+            return (int)Math.Max((Program.TPS * SecondsPerAttack - speed), 0);
         }
 
         private void ResetAttackTimer()
@@ -89,7 +93,8 @@ namespace Game
 
         public void AdvanceTimer(int i)
         {
-            AttackTimer -= i;
+            //AttackTimer -= i;
+            Attack(Target, manualAttack: true);
         }
 
         public float AttackPercentage()
@@ -130,6 +135,11 @@ namespace Game
 
         private void Tick(Location location, Entity entity)
         {
+            if (!(animation?.IsDone() ?? true))
+            {
+                animation.Tick(this);
+            }
+
             if (Health <= 0)
             {
                 if (!Program.IsSplit)
@@ -147,9 +157,21 @@ namespace Game
             AttackTimer--;
             if (AttackTimer <= 0)
             {
-                Attack(Target);
-                ResetAttackTimer();
+                while (!(animation?.IsDone() ?? true))
+                {
+                    animation.Tick(this);
+                }
+
+                if (Attack(Target))
+                {
+                    ResetAttackTimer();
+                }
             }
+        }
+
+        public void SetDefaultPosition(int x, int y)
+        {
+            defaultPosition = new Point(x, y);
         }
 
         public bool Damage(int damage)
@@ -158,19 +180,38 @@ namespace Game
             return this.Health <= 0;
         }
 
-        private void Attack(Enemy enemy)
+        private bool Attack(Enemy enemy, bool manualAttack = false)
         {
             if (enemy.Health <= 0)
             {
-                return;
+                return false;
+            }
+
+            if (!manualAttack)
+            {
+                if (Program.IsSplit)
+                {
+                    animation = AnimationManager.Instance["attack"].CreateNew();
+                }
+                else
+                {
+                    if (X < Program.ScreenWidth / 2)
+                    {
+                        animation = AnimationManager.Instance["left attack center"].CreateNew();
+                    }
+                    else
+                    {
+                        animation = AnimationManager.Instance["right attack center"].CreateNew();
+                    }
+                }
             }
 
             int x = (int)enemy.X + enemy.Width / 2 + Program.Random.Next(-16, 16);
             int y = (int)enemy.Y - 4 + Program.Random.Next(-4, 4);
 
-            int damage = this.damage;
+            int damage = manualAttack ? Math.Max(1, this.damage / 10) : this.damage;
             bool killed = false;
-            for (int i = 0; i < attacks; i++)
+            for (int i = 0; i < (manualAttack ? 1 : attacks); i++)
             {
                 Program.AddEntity(TextAnimation.Create(x, y, "" + damage, Color.White, 15));
                 x += 3;
@@ -184,6 +225,7 @@ namespace Game
                 Program.Killed(screen);
             }
 
+            return true;
         }
 
         private Bitmap Draw()
@@ -198,6 +240,84 @@ namespace Game
             GEntity<Fighter> entity = new GEntity<Fighter>(fighter);
             entity.TickAction += fighter.Tick;
             return entity;
+        }
+
+        public static void AniAttack(IDescription d)
+        {
+            Fighter fighter = d as Fighter;
+            if (fighter == null)
+            {
+                return;
+            }
+
+            if (fighter.animation.TicksLeft() > 13)
+            {
+                fighter.ChangeCoordsDelta(0, 1);
+            }
+            else if (fighter.animation.TicksLeft() > 10)
+            {
+                fighter.ChangeCoordsDelta(0, -(fighter.animation.TicksLeft() - 10) * 3);
+            }
+            else
+            {
+                fighter.ChangeCoordsDelta(0, 2);
+            }
+        }
+
+        public static void AniLeftAttackCenter(IDescription d)
+        {
+            Fighter fighter = d as Fighter;
+            if (fighter == null)
+            {
+                return;
+            }
+
+            if (fighter.animation.TicksLeft() > 13)
+            {
+                fighter.ChangeCoordsDelta(-1, 1);
+            }
+            else if (fighter.animation.TicksLeft() > 10)
+            {
+                fighter.ChangeCoordsDelta((fighter.animation.TicksLeft() - 10), -(fighter.animation.TicksLeft() - 10) * 3);
+            }
+            else
+            {
+                fighter.ChangeCoordsDelta(-0.66, 2);
+            }
+        }
+
+        public static void AniRightAttackCenter(IDescription d)
+        {
+            Fighter fighter = d as Fighter;
+            if (fighter == null)
+            {
+                return;
+            }
+
+            if (fighter.animation.TicksLeft() > 13)
+            {
+                fighter.ChangeCoordsDelta(1, 1);
+            }
+            else if (fighter.animation.TicksLeft() > 10)
+            {
+                fighter.ChangeCoordsDelta(-(fighter.animation.TicksLeft() - 10), -(fighter.animation.TicksLeft() - 10) * 3);
+            }
+            else
+            {
+                fighter.ChangeCoordsDelta(0.66, 2);
+            }
+        }
+
+        public static void AniResetPosition(IDescription d)
+        {
+            Fighter fighter = d as Fighter;
+            if (fighter == null)
+            {
+                return;
+            }
+
+            fighter.SetCoords(fighter.defaultPosition.X, fighter.defaultPosition.Y);
+            fighter.animation = null;
         }
     }
 }

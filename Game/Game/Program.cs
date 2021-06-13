@@ -101,6 +101,14 @@ namespace Game
             new Sprite("barsV", "Resources/UI/barsV.png", 6, 92);
             new Sprite("border", "Resources/UI/border.png", 198, 197);
             new Sprite("skull", "Resources/UI/skull_01.png", 101, 110);
+            new Sprite("skillHealth", "Resources/UI/skillHp.png", 16, 16);
+            new Sprite("skillDamage", "Resources/UI/skillStr.png", 16, 16);
+            new Sprite("skillSpeed", "Resources/UI/skillSp.png", 16, 16);
+
+
+            new Animation("left attack center", TPS / 2, null, null, Fighter.AniLeftAttackCenter, Fighter.AniResetPosition);
+            new Animation("right attack center", TPS / 2, null, null, Fighter.AniRightAttackCenter, Fighter.AniResetPosition);
+            new Animation("attack", TPS / 2, null, null, Fighter.AniAttack, Fighter.AniResetPosition);
 
             Engine.SetLocation(new Location(new Description2D(0, 0, ScreenWidth, ScreenHeight)));
 
@@ -119,13 +127,13 @@ namespace Game
 
             GEntity<UIBar> leftHealth = UIBar.Create(8, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, left.Description.HealthPercentage);
             GEntity<UIBar> leftAttackTimer = UIBar.Create(20, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, left.Description.AttackPercentage);
-            GEntity<UIBar> leftExp = UIBar.Create(20, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, left.Description.ExpPercentage);
-            GEntity<Counter> leftLevel = Counter.Create(20, ScreenHeight - 12 - 20, () => $"Level:{left.Description.Level},sp:{left.Description.SkillPoints}");
+            GEntity<UIBar> leftExp = UIBar.Create(8, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, left.Description.ExpPercentage);
+            GEntity<Counter> leftLevel = Counter.Create(8, ScreenHeight - 12 - 20, () => $"Level:{left.Description.Level},sp:{left.Description.SkillPoints}");
 
             GEntity<UIBar> rightHealth = UIBar.Create(ScreenWidth - 16, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, right.Description.HealthPercentage);
             GEntity<UIBar> rightAttackTimer = UIBar.Create(ScreenWidth - 28, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, right.Description.AttackPercentage);
-            GEntity<UIBar> rightExp = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, right.Description.ExpPercentage);
-            GEntity<Counter> rightLevel = Counter.Create(ScreenWidth - ScreenWidth / 4 - 28, ScreenHeight - 12 - 20, () => $"Level:{right.Description.Level},sp:{right.Description.SkillPoints}");
+            GEntity<UIBar> rightExp = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, right.Description.ExpPercentage);
+            GEntity<Counter> rightLevel = Counter.Create(ScreenWidth - ScreenWidth / 4 - 28 - 10, ScreenHeight - 12 - 20, () => $"Level:{right.Description.Level},sp:{right.Description.SkillPoints}");
 
             // Devtool
             Engine.TickEnd += (object sender, GameState state) =>
@@ -250,9 +258,11 @@ namespace Game
             RightLevelKills = JoinedLevelKills;
 
             left.Description.SetCoords(ScreenWidth / 4 - 24, ScreenHeight * 2 / 3 - 32);
+            left.Description.SetDefaultPosition(ScreenWidth / 4 - 24, ScreenHeight * 2 / 3 - 32);
             left.Description.screen = 1;
 
             right.Description.SetCoords(ScreenWidth * 3 / 4 - 24, ScreenHeight * 2 / 3 - 32);
+            right.Description.SetDefaultPosition(ScreenWidth * 3 / 4 - 24, ScreenHeight * 2 / 3 - 32);
             right.Description.screen = 2;
 
             if (joinedButton != null)
@@ -293,6 +303,8 @@ namespace Game
             RightLevelKills = 0;
             left.Description.SetCoords(ScreenWidth / 2 - 64, ScreenHeight * 2 / 3 - 32);
             right.Description.SetCoords(ScreenWidth / 2 + 16, ScreenHeight * 2 / 3 - 32);
+            left.Description.SetDefaultPosition(ScreenWidth / 2 - 64, ScreenHeight * 2 / 3 - 32);
+            right.Description.SetDefaultPosition(ScreenWidth / 2 + 16, ScreenHeight * 2 / 3 - 32);
             left.Description.screen = 0;
             right.Description.screen = 0;
 
@@ -366,7 +378,7 @@ namespace Game
                 });
             }
 
-            if ((JoinedLevel / 10) % 4 == 0)
+            if (((JoinedLevel - 1) / 10) % 4 == 0)
             {
                 min = 0;
                 max = 4;
@@ -469,9 +481,9 @@ namespace Game
             {
                 if (leftHealthButton == null)
                 {
-                    leftHealthButton = Button.Create(4, ScreenHeight - 40, Color.Red, () => Program.left.Description.UpgradeHealth(), 4);
-                    leftDamageButton = Button.Create(20, ScreenHeight - 40, Color.White, () => Program.left.Description.UpgradeDamage(), 4);
-                    leftSpeedButton = Button.Create(36, ScreenHeight - 40, Color.LightBlue, () => Program.left.Description.UpgradeSpeed(), 4);
+                    leftHealthButton = Button.Create(4, ScreenHeight - 48, Color.Red, () => Program.left.Description.UpgradeHealth(), 4, Sprite.Sprites["skillHealth"]);
+                    leftDamageButton = Button.Create(20, ScreenHeight - 48, Color.White, () => Program.left.Description.UpgradeDamage(), 4, Sprite.Sprites["skillDamage"]);
+                    leftSpeedButton = Button.Create(36, ScreenHeight - 48, Color.LightBlue, () => Program.left.Description.UpgradeSpeed(), 4, Sprite.Sprites["skillSpeed"]);
                     Program.AddEntity(leftHealthButton);
                     Program.AddEntity(leftDamageButton);
                     Program.AddEntity(leftSpeedButton);
@@ -481,9 +493,9 @@ namespace Game
             {
                 if (rightHealthButton == null)
                 {
-                    rightHealthButton = Button.Create(ScreenWidth - 52, ScreenHeight - 40, Color.Red, () => Program.right.Description.UpgradeHealth(), 4);
-                    rightDamageButton = Button.Create(ScreenWidth - 36, ScreenHeight - 40, Color.White, () => Program.right.Description.UpgradeDamage(), 4);
-                    rightSpeedButton = Button.Create(ScreenWidth - 20, ScreenHeight - 40, Color.LightBlue, () => Program.right.Description.UpgradeSpeed(), 4);
+                    rightHealthButton = Button.Create(ScreenWidth - 52, ScreenHeight - 48, Color.Red, () => Program.right.Description.UpgradeHealth(), 4, Sprite.Sprites["skillHealth"]);
+                    rightDamageButton = Button.Create(ScreenWidth - 36, ScreenHeight - 48, Color.White, () => Program.right.Description.UpgradeDamage(), 4, Sprite.Sprites["skillDamage"]);
+                    rightSpeedButton = Button.Create(ScreenWidth - 20, ScreenHeight - 48, Color.LightBlue, () => Program.right.Description.UpgradeSpeed(), 4, Sprite.Sprites["skillSpeed"]);
                     Program.AddEntity(rightHealthButton);
                     Program.AddEntity(rightDamageButton);
                     Program.AddEntity(rightSpeedButton);
