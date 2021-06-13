@@ -2,6 +2,8 @@
 using GameEngine._2D;
 using GameEngine.UI;
 using GameEngine.UI.AvaloniaUI;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -18,6 +20,7 @@ namespace Game
         public static readonly int ScreenHeight = 240;
         public static readonly int Scale = 2;
         public static GameEngine.GameEngine Engine;
+        public static GameFrame Frame;
 
         public static int TPS = 30;
 
@@ -78,6 +81,8 @@ namespace Game
 
         public const int RebirthLevel = 30;
 
+        public static MML[] backgroundMusic;
+
         static void Main(string[] args)
         {
             var wbuilder = new AvaloniaWindowBuilder();
@@ -91,7 +96,7 @@ namespace Game
                 .Build();
 
             Engine = builder.Engine;
-            GameFrame frame = builder.Frame;
+            Frame = builder.Frame;
 
             new Sprite("text", 0, 0);
 
@@ -136,28 +141,30 @@ namespace Game
             new Animation("attack", TPS / 2, null, null, Fighter.AniAttack, Fighter.AniResetPosition);
 
             MML grasslandsMML = new MML(
-                "<c4f8e8g4f8e8g" +
-                "c4f8e8f8d4e8f8d2" +
-                "c2a2f2c8d&d2c2g2f4c8d2a8b8g&g2");
+                "<c4f8e8g4f8e8" +
+                "c4f8e8f4r4 d4e8f8d2" +
+                "c2a2 f4&f8c8d2&d1 c2g2 f4c8d2a8 b8g8&g4&g2",
+                
+                "<<gcea");
+
+            MML saveMML = new MML(">>c32d32e8");
 
             MML forrestMML = new MML(
-                "<c4f8e8g4f8e8g" +
+                "<<c4f8e8g4f8e8g" +
                 "c4f8e8f8d4e8f8d2" +
                 "c2a2f2c8d&d2c2g2f4c8d2a8b8g&g2");
 
             MML cavesMML = new MML(
-                "<c4f8e8g4f8e8g" +
-                "c4f8e8f8d4e8f8d2" +
-                "c2a2f2c8d&d2c2g2f4c8d2a8b8g&g2");
+                "<<<e-4b+2>d+4<gd>c" +
+                "" +
+                "",
 
-            AvaloniaSound s = new AvaloniaSound(grasslandsMML.GetChannel(0));
-            SinWaveSound wav = (SinWaveSound)typeof(AvaloniaSound).GetField("wav", System.Reflection.BindingFlags.NonPublic
-                | System.Reflection.BindingFlags.Instance).GetValue(s);
-            typeof(SinWaveSound).GetField("loop", System.Reflection.BindingFlags.NonPublic
-                | System.Reflection.BindingFlags.Instance).SetValue(wav, true);
-            frame.PlaySound(s);
+                "<<<<f8g8f8g8f8g8f8g8"+
+                    "g8b-8g8b-8g8b-8g8b-8");
 
-            //frame.PlaySound();
+            backgroundMusic = new[] { grasslandsMML, forrestMML, cavesMML };
+
+            SoundManager.PlayLoopedMML(cavesMML);
 
             Engine.SetLocation(new Location(new Description2D(0, 0, ScreenWidth, ScreenHeight)));
 
@@ -202,6 +209,7 @@ namespace Game
             {
                 if (Program.Engine.Controllers.First()[(int)Program.Actions.ACTION].IsPress())
                 {
+                    Frame.PlaySound(new AvaloniaSound(saveMML.GetChannel(0)));
                     Save();
                     GEntity<TextAnimation> ani = TextAnimation.Create(ScreenWidth / 3, ScreenHeight / 2, "Saved", Color.White, 30, TPS, 0, 0);
                     ani.Description.SetCoords(ScreenWidth / 2  - ani.Description.trueWidth / 2, ani.Description.Y);
@@ -707,6 +715,7 @@ namespace Game
 
         public static void Killed(int screen)
         {
+            int previousLevel = JoinedLevel;
             if (screen == 1)
             {
                 if (LeftLevel == FurthestLevel)
@@ -761,6 +770,12 @@ namespace Game
             if (JoinedLevel > 1)
             {
                 ShowPreviousLevelButton();
+            }
+
+            if (previousLevel % 10 == 0 && previousLevel != JoinedLevel)
+            {
+                SoundManager.Clear();
+                SoundManager.PlayLoopedMML(backgroundMusic[((-1 + JoinedLevel) / 10) % 3]);
             }
         }
 
