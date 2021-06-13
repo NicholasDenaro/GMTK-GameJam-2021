@@ -16,6 +16,7 @@ namespace Game
         private int damage;
         private int speed;
         private int attacks;
+        private float hpHeal;
         private int maxHealth;
         public int Health { get; private set; }
 
@@ -41,6 +42,7 @@ namespace Game
             damage = 1;
             speed = 1;
             attacks = 1;
+            hpHeal = 0;
             Health = 10;
             maxHealth = Health;
             ResetAttackTimer();
@@ -77,6 +79,7 @@ namespace Game
             if (this.SkillPoints > 0)
             {
                 this.maxHealth = (int)(this.maxHealth * 1.25);
+                this.hpHeal += 0.2f;
                 this.SkillPoints--;
             }
         }
@@ -154,6 +157,16 @@ namespace Game
                 Health = maxHealth;
             }
 
+            if (Health < maxHealth)
+            {
+                Health += (int)hpHeal;
+                
+                if (Health > maxHealth)
+                {
+                    Health = maxHealth;
+                }
+            }
+
             AttackTimer--;
             if (AttackTimer <= 0)
             {
@@ -192,16 +205,19 @@ namespace Game
                 if (Program.IsSplit)
                 {
                     animation = AnimationManager.Instance["attack"].CreateNew();
+                    Program.AddEntity(SpriteAnimation.Create(Target.X + Target.Width / 2, Target.Y + Target.Height / 2, Sprite.Sprites["slash"], new int[] { 2, 1, 3, 2, 1 }));
                 }
                 else
                 {
                     if (X < Program.ScreenWidth / 2)
                     {
                         animation = AnimationManager.Instance["left attack center"].CreateNew();
+                        Program.AddEntity(SpriteAnimation.Create(Target.X + Target.Width * 3 / 4, Target.Y + Target.Height / 2, Sprite.Sprites["slash"], new int[] { 2, 1, 3, 2, 1 }));
                     }
                     else
                     {
                         animation = AnimationManager.Instance["right attack center"].CreateNew();
+                        Program.AddEntity(SpriteAnimation.Create(Target.X, Target.Y + Target.Height / 2, Sprite.Sprites["slash"], new int[] { 2, 1, 3, 2, 1 }));
                     }
                 }
             }

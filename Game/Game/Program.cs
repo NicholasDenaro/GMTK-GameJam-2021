@@ -104,6 +104,7 @@ namespace Game
             new Sprite("skillHealth", "Resources/UI/skillHp.png", 16, 16);
             new Sprite("skillDamage", "Resources/UI/skillStr.png", 16, 16);
             new Sprite("skillSpeed", "Resources/UI/skillSp.png", 16, 16);
+            new Sprite("slash", "Resources/UI/slash.png", 45, 38);
 
 
             new Animation("left attack center", TPS / 2, null, null, Fighter.AniLeftAttackCenter, Fighter.AniResetPosition);
@@ -393,7 +394,7 @@ namespace Game
             GEntity<UIBar> enemyHealth;
             if (screen == 1)
             {
-                enemy = Enemy.Create(ScreenWidth * 1 / 4 - 24, 32, LeftLevel, screen, GetEnemySprite());
+                enemy = Enemy.Create(ScreenWidth * 1 / 4 - 32, 32, LeftLevel, screen, GetEnemySprite());
                 enemyHealth = UIBar.Create(
                     ScreenWidth / 8, 24,
                     ScreenWidth / 4, 8,
@@ -406,7 +407,7 @@ namespace Game
             }
             else if (screen == 2)
             {
-                enemy = Enemy.Create(ScreenWidth * 3 / 4 - 24, 32, RightLevel, screen, GetEnemySprite());
+                enemy = Enemy.Create(ScreenWidth * 3 / 4 - 32, 32, RightLevel, screen, GetEnemySprite());
                 enemyHealth = UIBar.Create(
                     ScreenWidth * 5 / 8, 24,
                     ScreenWidth / 4, 8,
