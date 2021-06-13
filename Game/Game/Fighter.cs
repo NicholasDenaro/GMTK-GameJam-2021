@@ -30,7 +30,7 @@ namespace Game
 
         public static readonly float SecondsPerAttack = 2.0f;
 
-        private Fighter(int x, int y) : base(Sprite.Sprites["text"], x: x, y: y, 48, 64)
+        private Fighter(int x, int y, Sprite sprite) : base(sprite, x: x, y: y, 48, 64)
         {
             Level = 1;
             exp = 0;
@@ -124,7 +124,7 @@ namespace Game
             }
             else
             {
-                Program.AddEntity(TextAnimation.Create(X + Width / 2, Y - 4, $"{exp}xp", Color.White, 10));
+                Program.AddEntity(TextAnimation.Create(X + Width / 2, Y - 4, $"{exp}xp", Color.Yellow, 10));
             }
         }
 
@@ -191,10 +191,10 @@ namespace Game
             return bmp;
         }
 
-        public static GEntity<Fighter> Create(int x, int y)
+        public static GEntity<Fighter> Create(int x, int y, Sprite sprite)
         {
-            Fighter fighter = new Fighter(x, y);
-            fighter.DrawAction = fighter.Draw;
+            Fighter fighter = new Fighter(x, y, sprite);
+            //fighter.DrawAction = fighter.Draw;
             GEntity<Fighter> entity = new GEntity<Fighter>(fighter);
             entity.TickAction += fighter.Tick;
             return entity;

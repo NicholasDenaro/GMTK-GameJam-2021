@@ -27,6 +27,7 @@ namespace Game
             this.text = text;
             bmp = BitmapExtensions.CreateBitmap(width, height + (text != null ? 10 : 0));
             gfx = Graphics.FromImage(bmp);
+            gfx.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
         }
 
         private void Tick(Location location, Entity entity)

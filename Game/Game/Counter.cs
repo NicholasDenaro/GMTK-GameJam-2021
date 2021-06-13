@@ -20,6 +20,7 @@ namespace Game
             this.value = value;
             bmp = BitmapExtensions.CreateBitmap(Program.ScreenWidth, Program.ScreenHeight);
             gfx = Graphics.FromImage(bmp);
+            gfx.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
         }
 
         private Bitmap Draw()

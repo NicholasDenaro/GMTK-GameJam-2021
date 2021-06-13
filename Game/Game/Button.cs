@@ -16,8 +16,8 @@ namespace Game
         private Action pressAction;
         private bool isDown;
 
-        private Button(int x, int y, Color color, Action pressAction, int scaleDown)
-            : base(Sprite.Sprites["text"], x, y, 64 / scaleDown, 48 / scaleDown)
+        private Button(int x, int y, Color color, Action pressAction, int scaleDown, Sprite sprite)
+            : base(sprite, x, y, 64 / scaleDown, 48 / scaleDown)
         {
             this.pressAction = pressAction;
             bitmapUp = BitmapExtensions.CreateBitmap(64 / scaleDown, 48 / scaleDown);
@@ -44,6 +44,7 @@ namespace Game
                 if (this.Bounds.Contains(new Point(mci.X, mci.Y)))
                 {
                     isDown = true;
+                    ImageIndex = 1;
                     pressAction();
                 }
             }
@@ -51,6 +52,7 @@ namespace Game
             if (Program.Engine.Controllers.Skip(1).First()[(int)Program.Actions.CLICK].State == HoldState.RELEASE)
             {
                 isDown = false;
+                ImageIndex = 0;
             }
         }
 
@@ -59,10 +61,13 @@ namespace Game
             return isDown ? bitmapDown : bitmapUp;
         }
 
-        public static GEntity<Button> Create(int x, int y, Color color, Action pressAction, int scaleDown = 1)
+        public static GEntity<Button> Create(int x, int y, Color color, Action pressAction, int scaleDown = 1, Sprite sprite = null)
         {
-            Button button = new Button(x, y, color, pressAction, scaleDown);
-            button.DrawAction += button.Draw;
+            Button button = new Button(x, y, color, pressAction, scaleDown, sprite ?? Sprite.Sprites["text"]);
+            if (sprite == null)
+            {
+                button.DrawAction += button.Draw;
+            }
             GEntity<Button> entity = new GEntity<Button>(button);
             entity.TickAction += button.Tick;
             return entity;

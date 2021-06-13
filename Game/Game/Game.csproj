@@ -12,6 +12,8 @@
     <None Remove="Resources\Backgrounds\forrest2.PNG" />
     <None Remove="Resources\Backgrounds\grassland.PNG" />
     <None Remove="Resources\Backgrounds\grassland2.PNG" />
+    <None Remove="Resources\Characters\leftCharacter.png" />
+    <None Remove="Resources\Characters\rightCharacter.png" />
     <None Remove="Resources\mobs\ash_zombie.png" />
     <None Remove="Resources\mobs\bat.png" />
     <None Remove="Resources\mobs\bear.png" />
@@ -22,6 +24,12 @@
     <None Remove="Resources\mobs\pig.png" />
     <None Remove="Resources\mobs\sheep.png" />
     <None Remove="Resources\mobs\spider.png" />
+    <None Remove="Resources\UI\attackButton.png" />
+    <None Remove="Resources\UI\attackButtonSmall.png" />
+    <None Remove="Resources\UI\guiLeftArrow.png" />
+    <None Remove="Resources\UI\guiRightArrow.png" />
+    <None Remove="Resources\UI\PlankH.png" />
+    <None Remove="Resources\UI\PlankV.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +39,8 @@
     <EmbeddedResource Include="Resources\Backgrounds\forrest2.PNG" />
     <EmbeddedResource Include="Resources\Backgrounds\grassland.PNG" />
     <EmbeddedResource Include="Resources\Backgrounds\grassland2.PNG" />
+    <EmbeddedResource Include="Resources\Characters\leftCharacter.png" />
+    <EmbeddedResource Include="Resources\Characters\rightCharacter.png" />
     <EmbeddedResource Include="Resources\mobs\ash_zombie.png" />
     <EmbeddedResource Include="Resources\mobs\bat.png" />
     <EmbeddedResource Include="Resources\mobs\bear.png" />
@@ -41,6 +51,12 @@
     <EmbeddedResource Include="Resources\mobs\pig.png" />
     <EmbeddedResource Include="Resources\mobs\sheep.png" />
     <EmbeddedResource Include="Resources\mobs\spider.png" />
+    <EmbeddedResource Include="Resources\UI\attackButton.png" />
+    <EmbeddedResource Include="Resources\UI\attackButtonSmall.png" />
+    <EmbeddedResource Include="Resources\UI\guiLeftArrow.png" />
+    <EmbeddedResource Include="Resources\UI\guiRightArrow.png" />
+    <EmbeddedResource Include="Resources\UI\PlankH.png" />
+    <EmbeddedResource Include="Resources\UI\PlankV.png" />
   </ItemGroup>
 
   <ItemGroup>
