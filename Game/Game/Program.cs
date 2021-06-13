@@ -42,7 +42,11 @@ namespace Game
         private static GEntity<Description2D> LeftBackground;
         private static GEntity<Description2D> RightBackground;
 
-        private static List<GEntity<Enemy>> enemies = new List<GEntity<Enemy>>();
+        private static GEntity<Enemy> JoinedEnemy;
+        private static GEntity<Enemy> LeftEnemy;
+        private static GEntity<Enemy> RightEnemy;
+
+        //private static List<GEntity<Enemy>> enemies = new List<GEntity<Enemy>>();
 
         public static bool IsSplit { get; private set; }
 
@@ -196,6 +200,7 @@ namespace Game
                         if (JoinedLevel % 10 == 0)
                         {
                             JoinTogether();
+                            autoProgress = true;
                         }
                     }
                     else
@@ -266,11 +271,15 @@ namespace Game
             right.Description.SetDefaultPosition(ScreenWidth * 3 / 4 - 24, ScreenHeight * 2 / 3 - 32);
             right.Description.screen = 2;
 
-            if (joinedButton != null)
-            {
-                Engine.Location.RemoveEntity(joinedButton.Id);
-                Engine.Location.RemoveEntity(joinedProgress.Id);
-            }
+            ////if (joinedButton != null)
+            ////{
+            ////    Engine.Location.RemoveEntity(joinedButton.Id);
+            ////    Engine.Location.RemoveEntity(joinedProgress.Id);
+            ////}
+
+            joinedButton.Description.DrawAction = Program.invisible;
+            joinedProgress.Description.DrawAction = Program.invisible;
+
 
             if (leftButton == null)
             {
@@ -281,20 +290,30 @@ namespace Game
                 rightButton = Button.Create(ScreenWidth * 3 / 4 - 16, ScreenHeight - 48, Color.Red, rightAdvanceTimer, 2, Sprite.Sprites["attackbuttonsmall"]);
                 leftProgress = UIBar.Create(20, 4, ScreenWidth / 4, 8, BarColor.Yellow, false, () => LeftLevelKills / 10.0f, () => $"Level: {LeftLevel}, {LeftLevelKills}/10");
                 rightProgress = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28, 4, ScreenWidth / 4, 8, BarColor.Yellow, false, () => RightLevelKills / 10.0f, () => $"Level: {RightLevel}, {RightLevelKills}/10");
-            }
 
-            RemoveEnemies();
-
-            SummonEnemy(1);
-            SummonEnemy(2);
-
-            if (!Engine.Location.Entities.Contains(leftButton))
-            {
                 Program.AddEntity(leftButton);
                 Program.AddEntity(rightButton);
                 Program.AddEntity(leftProgress);
                 Program.AddEntity(rightProgress);
             }
+
+            //RemoveEnemies();
+
+            SummonEnemy(1);
+            SummonEnemy(2);
+
+            ////if (!Engine.Location.Entities.Contains(leftButton))
+            ////{
+            ////    Program.AddEntity(leftButton);
+            ////    Program.AddEntity(rightButton);
+            ////    Program.AddEntity(leftProgress);
+            ////    Program.AddEntity(rightProgress);
+            ////}
+
+            leftButton.Description.DrawAction = null;
+            rightButton.Description.DrawAction = null;
+            leftProgress.Description.DrawAction = leftProgress.Description.Draw;
+            rightProgress.Description.DrawAction = rightProgress.Description.Draw;
         }
         
         public static void JoinTogether()
@@ -315,13 +334,19 @@ namespace Game
 
             if (leftButton != null)
             {
-                Program.RemoveEntity(leftButton);
-                Program.RemoveEntity(leftProgress);
+                //Program.RemoveEntity(leftButton);
+                //Program.RemoveEntity(leftProgress);
+
+                leftButton.Description.DrawAction = Program.invisible;
+                leftProgress.Description.DrawAction = Program.invisible;
             }
             if (rightButton != null)
             {
-                Program.RemoveEntity(rightButton);
-                Program.RemoveEntity(rightProgress);
+                //Program.RemoveEntity(rightButton);
+                //Program.RemoveEntity(rightProgress);
+
+                rightButton.Description.DrawAction = Program.invisible;
+                rightProgress.Description.DrawAction = Program.invisible;
             }
 
             if (joinedButton == null)
@@ -334,35 +359,41 @@ namespace Game
 
                 joinedButton = Button.Create(ScreenWidth / 2 - 32, ScreenHeight - 48, Color.Red, bothAdvanceTimer, 1, Sprite.Sprites["attackbutton"]);
                 joinedProgress = UIBar.Create(20, 4, ScreenWidth * 7 / 8, 8, BarColor.Yellow, false, () => JoinedLevelKills / 10.0f, () => $"Level: {JoinedLevel}, {JoinedLevelKills}/10");
-            }
 
-            RemoveEnemies();
-
-            SummonEnemy(0);
-
-            if (!Engine.Location.Entities.Contains(joinedButton))
-            {
                 Program.AddEntity(joinedButton);
                 Program.AddEntity(joinedProgress);
             }
+
+            //RemoveEnemies();
+
+            SummonEnemy(0);
+
+            ////if (!Engine.Location.Entities.Contains(joinedButton))
+            ////{
+            ////    Program.AddEntity(joinedButton);
+            ////    Program.AddEntity(joinedProgress);
+            ////}
+
+            joinedButton.Description.DrawAction = null;
+            joinedProgress.Description.DrawAction = joinedProgress.Description.Draw;
         }
 
-        private static void RemoveEnemies(Func<GEntity<Enemy>, bool> filter = null)
-        {
-            if (filter == null)
-            {
-                filter = _ => true;
-            }
-            foreach (GEntity<Enemy> enemy in enemies)
-            {
-                if (filter(enemy))
-                {
-                    enemy.Description.Destroy();
-                }
-            }
+        ////private static void RemoveEnemies(Func<GEntity<Enemy>, bool> filter = null)
+        ////{
+        ////    if (filter == null)
+        ////    {
+        ////        filter = _ => true;
+        ////    }
+        ////    foreach (GEntity<Enemy> enemy in enemies)
+        ////    {
+        ////        if (filter(enemy))
+        ////        {
+        ////            enemy.Description.Destroy();
+        ////        }
+        ////    }
 
-            enemies.RemoveAll((e) => filter(e));
-        }
+        ////    enemies.RemoveAll((e) => filter(e));
+        ////}
 
         private static List<Sprite> enemySpriteList;
         public static Sprite GetEnemySprite()
@@ -390,48 +421,98 @@ namespace Game
 
         public static void SummonEnemy(int screen)
         {
-            GEntity<Enemy> enemy;
+            //GEntity<Enemy> enemy;
             GEntity<UIBar> enemyHealth;
             if (screen == 1)
             {
-                enemy = Enemy.Create(ScreenWidth * 1 / 4 - 32, 32, LeftLevel, screen, GetEnemySprite());
-                enemyHealth = UIBar.Create(
-                    ScreenWidth / 8, 24,
-                    ScreenWidth / 4, 8,
-                    BarColor.Red,
-                    false,
-                    enemy.Description.HealthPercentage);
-                left.Description.Target = enemy.Description;
-                enemy.Description.SetTargets(left.Description);
+                if (LeftEnemy == null)
+                {
+                    LeftEnemy = Enemy.Create(ScreenWidth * 1 / 4 - 32, 32, LeftLevel, screen, GetEnemySprite());
+                    enemyHealth = UIBar.Create(
+                        ScreenWidth / 8, 24,
+                        ScreenWidth / 4, 8,
+                        BarColor.Red,
+                        false,
+                        LeftEnemy.Description.HealthPercentage);
+                    LeftEnemy.Description.HealthBar = enemyHealth;
+                    Program.AddEntity(LeftEnemy);
+                    Program.AddEntity(enemyHealth);
+                }
+                else
+                {
+                    LeftEnemy.Description.Summon(LeftLevel, GetEnemySprite());
+                }
+
+                left.Description.Target = LeftEnemy.Description;
+                LeftEnemy.Description.SetTargets(left.Description);
+
+                JoinedEnemy.Description.DrawAction = Program.invisible;
+                JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
 
             }
             else if (screen == 2)
             {
-                enemy = Enemy.Create(ScreenWidth * 3 / 4 - 32, 32, RightLevel, screen, GetEnemySprite());
-                enemyHealth = UIBar.Create(
-                    ScreenWidth * 5 / 8, 24,
-                    ScreenWidth / 4, 8,
-                    BarColor.Red,
-                    false,
-                    enemy.Description.HealthPercentage);
-                right.Description.Target = enemy.Description;
-                enemy.Description.SetTargets(right.Description);
+                if (RightEnemy == null)
+                {
+                    RightEnemy = Enemy.Create(ScreenWidth * 3 / 4 - 32, 32, RightLevel, screen, GetEnemySprite());
+                    enemyHealth = UIBar.Create(
+                        ScreenWidth * 5 / 8, 24,
+                        ScreenWidth / 4, 8,
+                        BarColor.Red,
+                        false,
+                        RightEnemy.Description.HealthPercentage);
+                    RightEnemy.Description.HealthBar = enemyHealth;
+                    Program.AddEntity(RightEnemy);
+                    Program.AddEntity(enemyHealth);
+                }
+                else
+                {
+                    RightEnemy.Description.Summon(RightLevel, GetEnemySprite());
+                }
+
+                right.Description.Target = RightEnemy.Description;
+                RightEnemy.Description.SetTargets(right.Description);
+
+                JoinedEnemy.Description.DrawAction = Program.invisible;
+                JoinedEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
             }
             else
             {
-                enemy = Enemy.Create(ScreenWidth / 2 - 32, 32, JoinedLevel, screen, GetEnemySprite());
-                enemyHealth = UIBar.Create(ScreenWidth / 3, 24, ScreenWidth / 3, 8, BarColor.Red, false, enemy.Description.HealthPercentage);
-                left.Description.Target = enemy.Description;
-                right.Description.Target = enemy.Description;
-                enemy.Description.SetTargets(left.Description, right.Description);
+                if (JoinedEnemy == null)
+                {
+                    JoinedEnemy = Enemy.Create(ScreenWidth / 2 - 32, 32, JoinedLevel, screen, GetEnemySprite());
+                    enemyHealth = UIBar.Create(ScreenWidth / 3, 24, ScreenWidth / 3, 8, BarColor.Red, false, JoinedEnemy.Description.HealthPercentage);
+                    JoinedEnemy.Description.HealthBar = enemyHealth;
+                    Program.AddEntity(JoinedEnemy);
+                    Program.AddEntity(enemyHealth);
+                }
+                else
+                {
+                    JoinedEnemy.Description.Summon(JoinedLevel, GetEnemySprite());
+                }
+                
+                left.Description.Target = JoinedEnemy.Description;
+                right.Description.Target = JoinedEnemy.Description;
+                JoinedEnemy.Description.SetTargets(left.Description, right.Description);
+
+                if (LeftEnemy != null)
+                {
+                    LeftEnemy.Description.DrawAction = Program.invisible;
+                    LeftEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
+                }
+                if (RightEnemy != null)
+                {
+                    RightEnemy.Description.DrawAction = Program.invisible;
+                    RightEnemy.Description.HealthBar.Description.DrawAction = Program.invisible;
+                }
             }
-            RemoveEnemies((e) => e.Description.screen == screen);
+            //RemoveEnemies((e) => e.Description.screen == screen);
 
-            Program.AddEntity(enemy);
-            enemies.Add(enemy);
+            //Program.AddEntity(enemy);
+            //enemies.Add(enemy);
 
-            enemy.Description.HealthBar = enemyHealth;
-            Program.AddEntity(enemyHealth);
+            //enemy.Description.HealthBar = enemyHealth;
+            //Program.AddEntity(enemyHealth);
         }
 
         public static void GiveExp(int screen, int exp)

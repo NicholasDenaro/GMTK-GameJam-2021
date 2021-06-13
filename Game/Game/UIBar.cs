@@ -35,7 +35,7 @@ namespace Game
 
         }
 
-        private Bitmap Draw()
+        public Bitmap Draw()
         {
             gfx.Clear(Color.Transparent);
             if (vertical)

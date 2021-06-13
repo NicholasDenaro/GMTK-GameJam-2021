@@ -56,7 +56,7 @@ namespace Game
             }
         }
 
-        private Bitmap Draw()
+        public Bitmap Draw()
         {
             return isDown ? bitmapDown : bitmapUp;
         }

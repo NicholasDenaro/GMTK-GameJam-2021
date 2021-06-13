@@ -225,7 +225,7 @@ namespace Game
             int x = (int)enemy.X + enemy.Width / 2 + Program.Random.Next(-16, 16);
             int y = (int)enemy.Y - 4 + Program.Random.Next(-4, 4);
 
-            int damage = manualAttack ? Math.Max(1, this.damage / 10) : this.damage;
+            int damage = manualAttack ? Math.Max(1, this.damage / 5) : this.damage;
             bool killed = false;
             for (int i = 0; i < (manualAttack ? 1 : attacks); i++)
             {
