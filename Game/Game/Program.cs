@@ -5,6 +5,7 @@ using GameEngine.UI.AvaloniaUI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using static GameEngine._2D.Description2D;
@@ -110,7 +111,6 @@ namespace Game
             new Sprite("skillSpeed", "Resources/UI/skillSp.png", 16, 16);
             new Sprite("slash", "Resources/UI/slash.png", 45, 38);
 
-
             new Animation("left attack center", TPS / 2, null, null, Fighter.AniLeftAttackCenter, Fighter.AniResetPosition);
             new Animation("right attack center", TPS / 2, null, null, Fighter.AniRightAttackCenter, Fighter.AniResetPosition);
             new Animation("attack", TPS / 2, null, null, Fighter.AniAttack, Fighter.AniResetPosition);
@@ -127,8 +127,11 @@ namespace Game
 
             Engine.Start();
 
+
             left = Fighter.Create(ScreenWidth / 2 - 64, ScreenHeight * 2 / 3 - 32, Sprite.Sprites["fighter1"]);
             right = Fighter.Create(ScreenWidth / 2 + 16, ScreenHeight * 2 / 3 - 32, Sprite.Sprites["fighter2"]);
+
+            Load();
 
             GEntity<UIBar> leftHealth = UIBar.Create(8, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, left.Description.HealthPercentage);
             GEntity<UIBar> leftAttackTimer = UIBar.Create(20, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, left.Description.AttackPercentage);
@@ -156,7 +159,14 @@ namespace Game
             Program.AddEntity(left);
             Program.AddEntity(right);
 
-            JoinTogether();
+            if (Program.IsSplit)
+            {
+                Splitup();
+            }
+            else
+            {
+                JoinTogether();
+            }
 
             Program.AddEntity(leftHealth);
             Program.AddEntity(leftAttackTimer);
@@ -616,6 +626,125 @@ namespace Game
                 }
 
                 JoinTogether();
+            }
+        }
+
+        public static void Save()
+        {
+            GameData dat = new GameData
+            {
+                JoinedLevel = Program.JoinedLevel,
+                FurthestLevel = Program.FurthestLevel,
+                JoinedLevelKills = Program.JoinedLevelKills,
+                LeftLevelKills = Program.LeftLevelKills,
+                RightLevelKills = Program.RightLevelKills,
+                IsSplit = Program.IsSplit,
+                Left = new FighterData
+                {
+                    Level = left.Description.Level,
+                    Exp = left.Description.exp,
+                    SkillPoints = left.Description.SkillPoints,
+                    MaxHealth = left.Description.maxHealth,
+                    Health = (int)left.Description.Health,
+                    Damage = left.Description.damage,
+                    Speed = left.Description.speed,
+                    Attacks = left.Description.attacks,
+                    HpHeal = left.Description.hpHeal,
+                },
+                Right = new FighterData
+                {
+                    Level = right.Description.Level,
+                    Exp = right.Description.exp,
+                    SkillPoints = right.Description.SkillPoints,
+                    MaxHealth = right.Description.maxHealth,
+                    Health = (int)right.Description.Health,
+                    Damage = right.Description.damage,
+                    Speed = right.Description.speed,
+                    Attacks = right.Description.attacks,
+                    HpHeal = right.Description.hpHeal,
+                },
+            };
+
+            string output = System.Text.Json.JsonSerializer.Serialize<object>(dat);
+
+            if (!Directory.Exists(Path.Combine(Path.GetTempPath(), "idle-together")))
+            {
+                Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "idle-together"));
+            }
+
+            File.WriteAllText(Path.Combine(Path.GetTempPath(),"idle-together","save.dat"), output);
+        }
+
+        public class FighterData
+        {
+            public int Level { get; set; }
+            public int Exp { get; set; }
+            public int SkillPoints { get; set; }
+            public int MaxHealth { get; set; }
+            public int Health { get; set; }
+            public int Damage { get; set; }
+            public int Speed { get; set; }
+            public int Attacks { get; set; }
+            public float HpHeal { get; set; }
+        }
+
+        public class GameData
+        {
+            public int JoinedLevelKills { get; set; }
+            public int LeftLevelKills { get; set; }
+            public int RightLevelKills { get; set; }
+            public int JoinedLevel { get; set; }
+            public int LeftLevel { get; set; }
+            public int RightLevel { get; set; }
+            public int FurthestLevel { get; set; }
+            public FighterData Left { get; set; }
+            public FighterData Right { get; set; }
+
+            public bool IsSplit { get; set; }
+        }
+
+        public static void Load()
+        {
+            if (File.Exists(Path.Combine(Path.GetTempPath(), "idle-together", "save.dat")))
+            {
+                string input = File.ReadAllText(Path.Combine(Path.GetTempPath(), "idle-together", "save.dat"));
+
+                GameData dat = System.Text.Json.JsonSerializer.Deserialize<GameData>(input);
+
+                Program.IsSplit = dat.IsSplit;
+                Program.JoinedLevelKills = dat.JoinedLevelKills;
+                Program.LeftLevelKills = dat.LeftLevelKills;
+                Program.RightLevelKills = dat.RightLevelKills;
+                Program.JoinedLevel = dat.JoinedLevel;
+                Program.LeftLevel = dat.LeftLevel;
+                Program.RightLevel = dat.RightLevel;
+                Program.FurthestLevel = dat.FurthestLevel;
+
+                left.Description.Level = dat.Left.Level;
+                left.Description.exp = dat.Left.Exp;
+                left.Description.SkillPoints = dat.Left.SkillPoints;
+                left.Description.maxHealth = dat.Left.MaxHealth;
+                left.Description.Health = dat.Left.Health;
+                left.Description.damage = dat.Left.Damage;
+                left.Description.speed = dat.Left.Speed;
+                left.Description.attacks = dat.Left.Attacks;
+                left.Description.hpHeal = dat.Left.HpHeal;
+
+                right.Description.Level = dat.Left.Level;
+                right.Description.exp = dat.Right.Exp;
+                right.Description.SkillPoints = dat.Right.SkillPoints;
+                right.Description.maxHealth = dat.Right.MaxHealth;
+                right.Description.Health = dat.Right.Health;
+                right.Description.damage = dat.Right.Damage;
+                right.Description.speed = dat.Right.Speed;
+                right.Description.attacks = dat.Right.Attacks;
+                right.Description.hpHeal = dat.Right.HpHeal;
+
+                if (left.Description.SkillPoints > 0 || right.Description.SkillPoints > 0)
+                {
+                    ShowSkillButtons(false);
+                    ShowSkillButtons(true);
+                }
             }
         }
 

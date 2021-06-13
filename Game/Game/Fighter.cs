@@ -11,16 +11,16 @@ namespace Game
     class Fighter : Description2D, IAttacker
     {
         private Animation animation;
-        public int Level { get; private set; }
-        private int exp;
-        private int damage;
-        private int speed;
-        private int attacks;
-        private float hpHeal;
-        private int maxHealth;
-        public float Health { get; private set; }
+        public int Level { get; set; }
+        public int exp;
+        public int damage;
+        public int speed;
+        public int attacks;
+        public float hpHeal;
+        public int maxHealth;
+        public float Health { get; set; }
 
-        public int SkillPoints { get; private set; }
+        public int SkillPoints { get; set; }
 
         private Bitmap bmp;
         private Graphics gfx;
