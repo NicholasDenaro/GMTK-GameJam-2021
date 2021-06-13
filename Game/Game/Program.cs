@@ -135,6 +135,30 @@ namespace Game
             new Animation("right attack center", TPS / 2, null, null, Fighter.AniRightAttackCenter, Fighter.AniResetPosition);
             new Animation("attack", TPS / 2, null, null, Fighter.AniAttack, Fighter.AniResetPosition);
 
+            MML grasslandsMML = new MML(
+                "<c4f8e8g4f8e8g" +
+                "c4f8e8f8d4e8f8d2" +
+                "c2a2f2c8d&d2c2g2f4c8d2a8b8g&g2");
+
+            MML forrestMML = new MML(
+                "<c4f8e8g4f8e8g" +
+                "c4f8e8f8d4e8f8d2" +
+                "c2a2f2c8d&d2c2g2f4c8d2a8b8g&g2");
+
+            MML cavesMML = new MML(
+                "<c4f8e8g4f8e8g" +
+                "c4f8e8f8d4e8f8d2" +
+                "c2a2f2c8d&d2c2g2f4c8d2a8b8g&g2");
+
+            AvaloniaSound s = new AvaloniaSound(grasslandsMML.GetChannel(0));
+            SinWaveSound wav = (SinWaveSound)typeof(AvaloniaSound).GetField("wav", System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance).GetValue(s);
+            typeof(SinWaveSound).GetField("loop", System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance).SetValue(wav, true);
+            frame.PlaySound(s);
+
+            //frame.PlaySound();
+
             Engine.SetLocation(new Location(new Description2D(0, 0, ScreenWidth, ScreenHeight)));
 
             Color[] bgColors = new[] { Color.SkyBlue, Color.ForestGreen, Color.FromArgb(255, 30, 25, 10) };
