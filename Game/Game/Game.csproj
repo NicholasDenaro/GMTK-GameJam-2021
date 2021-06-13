@@ -26,10 +26,18 @@
     <None Remove="Resources\mobs\spider.png" />
     <None Remove="Resources\UI\attackButton.png" />
     <None Remove="Resources\UI\attackButtonSmall.png" />
+    <None Remove="Resources\UI\barsH.png" />
+    <None Remove="Resources\UI\barsV.png" />
+    <None Remove="Resources\UI\border.png" />
     <None Remove="Resources\UI\guiLeftArrow.png" />
     <None Remove="Resources\UI\guiRightArrow.png" />
     <None Remove="Resources\UI\PlankH.png" />
     <None Remove="Resources\UI\PlankV.png" />
+    <None Remove="Resources\UI\Plank_10.png" />
+    <None Remove="Resources\UI\skillHp.png" />
+    <None Remove="Resources\UI\skillSp.png" />
+    <None Remove="Resources\UI\skillStr.png" />
+    <None Remove="Resources\UI\skull_01.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,10 +61,18 @@
     <EmbeddedResource Include="Resources\mobs\spider.png" />
     <EmbeddedResource Include="Resources\UI\attackButton.png" />
     <EmbeddedResource Include="Resources\UI\attackButtonSmall.png" />
+    <EmbeddedResource Include="Resources\UI\barsH.png" />
+    <EmbeddedResource Include="Resources\UI\barsV.png" />
+    <EmbeddedResource Include="Resources\UI\border.png" />
     <EmbeddedResource Include="Resources\UI\guiLeftArrow.png" />
     <EmbeddedResource Include="Resources\UI\guiRightArrow.png" />
     <EmbeddedResource Include="Resources\UI\PlankH.png" />
     <EmbeddedResource Include="Resources\UI\PlankV.png" />
+    <EmbeddedResource Include="Resources\UI\Plank_10.png" />
+    <EmbeddedResource Include="Resources\UI\skillHp.png" />
+    <EmbeddedResource Include="Resources\UI\skillSp.png" />
+    <EmbeddedResource Include="Resources\UI\skillStr.png" />
+    <EmbeddedResource Include="Resources\UI\skull_01.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -24,7 +24,7 @@ namespace Game
 
         private bool removed;
 
-        private Enemy(int x, int y, int level, int screen) : base(Sprite.Sprites["chicken"], x: x, y: y, 64, 64)
+        private Enemy(int x, int y, int level, int screen, Sprite sprite) : base(sprite, x: x, y: y, 64, 64)
         {
             this.Level = level;
             this.Health = (int)Math.Pow(1.2, level) * 10 * (this.Level == 10 ? 20 : 1); // Boss health
@@ -33,10 +33,17 @@ namespace Game
             this.speed = 1 + level / 10;
             this.screen = screen;
             AttackTimer = Program.TPS * 5 / (1 + (speed / 3));
-            ////bmp = BitmapExtensions.CreateBitmap(48, 64);
-            ////Graphics gfx = Graphics.FromImage(bmp);
-            ////gfx.FillRectangle(Brushes.MediumPurple, 0, 0, 48, 64);
             bmp = new Bitmap(Image());
+            using Graphics gfx = Graphics.FromImage(bmp);
+            Sprite border = Sprite.Sprites["border"];
+            gfx.DrawImage(border.Images[0], new Rectangle(0, 0, Width, Height), new Rectangle(0, 0, border.Width, border.Height), GraphicsUnit.Pixel);
+            if (this.Level % 10 == 0)
+            {
+                Sprite plank = Sprite.Sprites["plank"];
+                gfx.DrawImage(plank.Images[0], new Rectangle(0, Height - 16, 16, 16), new Rectangle(0, 0, plank.Width, plank.Height), GraphicsUnit.Pixel);
+                Sprite skull = Sprite.Sprites["skull"];
+                gfx.DrawImage(skull.Images[0], new Rectangle(0, Height - 16, 16, 16), new Rectangle(0, 0, skull.Width, skull.Height), GraphicsUnit.Pixel);
+            }
         }
 
         public float HealthPercentage()
@@ -71,6 +78,8 @@ namespace Game
 
             if (Health <= 0)
             {
+                DrawAction = Program.invisible;
+                bmp.Dispose();
                 Destroy();
                 Program.SummonEnemy(screen);
             }
@@ -99,9 +108,9 @@ namespace Game
             return bmp;
         }
 
-        public static GEntity<Enemy> Create(int x, int y, int level, int screen)
+        public static GEntity<Enemy> Create(int x, int y, int level, int screen, Sprite sprite)
         {
-            Enemy enemy = new Enemy(x, y, level, screen);
+            Enemy enemy = new Enemy(x, y, level, screen, sprite);
             enemy.DrawAction += enemy.Draw;
             GEntity<Enemy> entity = new GEntity<Enemy>(enemy);
             entity.TickAction += enemy.Tick;

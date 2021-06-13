@@ -15,7 +15,7 @@ namespace Game
         Bitmap bmp;
         Graphics gfx;
 
-        private Counter(int x, int y, Func<string> value) : base(Sprite.Sprites["text"], x: x, y: y, Program.ScreenWidth, 20)
+        private Counter(int x, int y, Func<string> value) : base(Sprite.Sprites["plank"], x: x, y: y, 100, 20)
         {
             this.value = value;
             bmp = BitmapExtensions.CreateBitmap(Program.ScreenWidth, Program.ScreenHeight);
@@ -26,7 +26,8 @@ namespace Game
         private Bitmap Draw()
         {
             gfx.Clear(Color.Transparent);
-            gfx.DrawString(value(), new Font("Arial", 10), Brushes.Black, 0, 0);
+            gfx.DrawImage(Sprite.GetImage(0), new Rectangle(0, 0, Width, Height), new Rectangle(0, 0, Sprite.Width, Sprite.Height), GraphicsUnit.Pixel);
+            gfx.DrawString(value(), new Font("Arial", 10, FontStyle.Bold), Brushes.White, 2, 0);
 
             return bmp;
         }

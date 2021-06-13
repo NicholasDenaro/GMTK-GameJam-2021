@@ -85,12 +85,22 @@ namespace Game
             new Sprite("grasslands", "Resources/Backgrounds/grassland.PNG", 320, 160);
             new Sprite("grasslands2", "Resources/Backgrounds/grassland2.PNG", 160, 160);
             new Sprite("chicken", "Resources/mobs/chicken.png", 64, 64);
+            new Sprite("pig", "Resources/mobs/pig.png", 64, 64);
+            new Sprite("sheep", "Resources/mobs/sheep.png", 64, 64);
+            new Sprite("ox", "Resources/mobs/ox.png", 64, 64);
             new Sprite("fighter1", "Resources/Characters/leftCharacter.png", 39, 64);
             new Sprite("fighter2", "Resources/Characters/rightCharacter.png", 43, 64);
             new Sprite("attackbutton", "Resources/UI/attackButton.png", 64, 48);
             new Sprite("attackbuttonsmall", "Resources/UI/attackButtonSmall.png", 32, 24);
             new Sprite("leftArrow", "Resources/UI/guiLeftArrow.png", 21, 16);
             new Sprite("rightArrow", "Resources/UI/guiRightArrow.png", 21, 16);
+            new Sprite("plankH", "Resources/UI/PlankH.png", 96, 8);
+            new Sprite("plankV", "Resources/UI/PlankV.png", 8, 96);
+            new Sprite("plank", "Resources/UI/Plank_10.png", 413, 162);
+            new Sprite("barsH", "Resources/UI/barsH.png", 92, 6);
+            new Sprite("barsV", "Resources/UI/barsV.png", 6, 92);
+            new Sprite("border", "Resources/UI/border.png", 198, 197);
+            new Sprite("skull", "Resources/UI/skull_01.png", 101, 110);
 
             Engine.SetLocation(new Location(new Description2D(0, 0, ScreenWidth, ScreenHeight)));
 
@@ -107,14 +117,14 @@ namespace Game
             left = Fighter.Create(ScreenWidth / 2 - 64, ScreenHeight * 2 / 3 - 32, Sprite.Sprites["fighter1"]);
             right = Fighter.Create(ScreenWidth / 2 + 16, ScreenHeight * 2 / 3 - 32, Sprite.Sprites["fighter2"]);
 
-            GEntity<UIBar> leftHealth = UIBar.Create(8, ScreenHeight / 3, 8, ScreenHeight / 3, Brushes.Red, true, left.Description.HealthPercentage);
-            GEntity<UIBar> leftAttackTimer = UIBar.Create(20, ScreenHeight / 3, 8, ScreenHeight / 3, Brushes.Blue, true, left.Description.AttackPercentage);
-            GEntity<UIBar> leftExp = UIBar.Create(20, ScreenHeight - 12, ScreenWidth / 4, 8, Brushes.Cyan, false, left.Description.ExpPercentage);
+            GEntity<UIBar> leftHealth = UIBar.Create(8, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, left.Description.HealthPercentage);
+            GEntity<UIBar> leftAttackTimer = UIBar.Create(20, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, left.Description.AttackPercentage);
+            GEntity<UIBar> leftExp = UIBar.Create(20, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, left.Description.ExpPercentage);
             GEntity<Counter> leftLevel = Counter.Create(20, ScreenHeight - 12 - 20, () => $"Level:{left.Description.Level},sp:{left.Description.SkillPoints}");
 
-            GEntity<UIBar> rightHealth = UIBar.Create(ScreenWidth - 16, ScreenHeight / 3, 8, ScreenHeight / 3, Brushes.Red, true, right.Description.HealthPercentage);
-            GEntity<UIBar> rightAttackTimer = UIBar.Create(ScreenWidth - 28, ScreenHeight / 3, 8, ScreenHeight / 3, Brushes.Blue, true, right.Description.AttackPercentage);
-            GEntity<UIBar> rightExp = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28, ScreenHeight - 12, ScreenWidth / 4, 8, Brushes.Cyan, false, right.Description.ExpPercentage);
+            GEntity<UIBar> rightHealth = UIBar.Create(ScreenWidth - 16, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Red, true, right.Description.HealthPercentage);
+            GEntity<UIBar> rightAttackTimer = UIBar.Create(ScreenWidth - 28, ScreenHeight / 3, 8, ScreenHeight / 3, BarColor.Blue, true, right.Description.AttackPercentage);
+            GEntity<UIBar> rightExp = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28, ScreenHeight - 12, ScreenWidth / 4, 8, BarColor.Cyan, false, right.Description.ExpPercentage);
             GEntity<Counter> rightLevel = Counter.Create(ScreenWidth - ScreenWidth / 4 - 28, ScreenHeight - 12 - 20, () => $"Level:{right.Description.Level},sp:{right.Description.SkillPoints}");
 
             // Devtool
@@ -258,8 +268,8 @@ namespace Game
 
                 leftButton = Button.Create(ScreenWidth / 4 - 16, ScreenHeight - 48, Color.Red, leftAdvanceTimer, 2, Sprite.Sprites["attackbuttonsmall"]);
                 rightButton = Button.Create(ScreenWidth * 3 / 4 - 16, ScreenHeight - 48, Color.Red, rightAdvanceTimer, 2, Sprite.Sprites["attackbuttonsmall"]);
-                leftProgress = UIBar.Create(20, 4, ScreenWidth / 4, 8, Brushes.Wheat, false, () => LeftLevelKills / 10.0f, () => $"Level: {LeftLevel}, {LeftLevelKills}/10");
-                rightProgress = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28, 4, ScreenWidth / 4, 8, Brushes.Wheat, false, () => RightLevelKills / 10.0f, () => $"Level: {RightLevel}, {RightLevelKills}/10");
+                leftProgress = UIBar.Create(20, 4, ScreenWidth / 4, 8, BarColor.Yellow, false, () => LeftLevelKills / 10.0f, () => $"Level: {LeftLevel}, {LeftLevelKills}/10");
+                rightProgress = UIBar.Create(ScreenWidth - ScreenWidth / 4 - 28, 4, ScreenWidth / 4, 8, BarColor.Yellow, false, () => RightLevelKills / 10.0f, () => $"Level: {RightLevel}, {RightLevelKills}/10");
             }
 
             RemoveEnemies();
@@ -310,7 +320,7 @@ namespace Game
                 };
 
                 joinedButton = Button.Create(ScreenWidth / 2 - 32, ScreenHeight - 48, Color.Red, bothAdvanceTimer, 1, Sprite.Sprites["attackbutton"]);
-                joinedProgress = UIBar.Create(20, 4, ScreenWidth * 7 / 8, 8, Brushes.Wheat, false, () => JoinedLevelKills / 10.0f, () => $"Level: {JoinedLevel}, {JoinedLevelKills}/10");
+                joinedProgress = UIBar.Create(20, 4, ScreenWidth * 7 / 8, 8, BarColor.Yellow, false, () => JoinedLevelKills / 10.0f, () => $"Level: {JoinedLevel}, {JoinedLevelKills}/10");
             }
 
             RemoveEnemies();
@@ -341,17 +351,41 @@ namespace Game
             enemies.RemoveAll((e) => filter(e));
         }
 
+        private static List<Sprite> enemySpriteList;
+        public static Sprite GetEnemySprite()
+        {
+            int min = 0;
+            int max = 0;
+            if (enemySpriteList == null)
+            {
+                enemySpriteList = new List<Sprite>(new[]{
+                    Sprite.Sprites["chicken"],
+                    Sprite.Sprites["pig"],
+                    Sprite.Sprites["sheep"],
+                    Sprite.Sprites["ox"],
+                });
+            }
+
+            if ((JoinedLevel / 10) % 4 == 0)
+            {
+                min = 0;
+                max = 4;
+            }
+
+            return enemySpriteList[Program.Random.Next(min, max)];
+        }
+
         public static void SummonEnemy(int screen)
         {
             GEntity<Enemy> enemy;
             GEntity<UIBar> enemyHealth;
             if (screen == 1)
             {
-                enemy = Enemy.Create(ScreenWidth * 1 / 4 - 24, 32, LeftLevel, screen);
+                enemy = Enemy.Create(ScreenWidth * 1 / 4 - 24, 32, LeftLevel, screen, GetEnemySprite());
                 enemyHealth = UIBar.Create(
                     ScreenWidth / 8, 24,
                     ScreenWidth / 4, 8,
-                    Brushes.Red,
+                    BarColor.Red,
                     false,
                     enemy.Description.HealthPercentage);
                 left.Description.Target = enemy.Description;
@@ -360,11 +394,11 @@ namespace Game
             }
             else if (screen == 2)
             {
-                enemy = Enemy.Create(ScreenWidth * 3 / 4 - 24, 32, RightLevel, screen);
+                enemy = Enemy.Create(ScreenWidth * 3 / 4 - 24, 32, RightLevel, screen, GetEnemySprite());
                 enemyHealth = UIBar.Create(
                     ScreenWidth * 5 / 8, 24,
                     ScreenWidth / 4, 8,
-                    Brushes.Red,
+                    BarColor.Red,
                     false,
                     enemy.Description.HealthPercentage);
                 right.Description.Target = enemy.Description;
@@ -372,8 +406,8 @@ namespace Game
             }
             else
             {
-                enemy = Enemy.Create(ScreenWidth / 2 - 24, 32, JoinedLevel, screen);
-                enemyHealth = UIBar.Create(ScreenWidth / 3, 24, ScreenWidth / 3, 8, Brushes.Red, false, enemy.Description.HealthPercentage);
+                enemy = Enemy.Create(ScreenWidth / 2 - 32, 32, JoinedLevel, screen, GetEnemySprite());
+                enemyHealth = UIBar.Create(ScreenWidth / 3, 24, ScreenWidth / 3, 8, BarColor.Red, false, enemy.Description.HealthPercentage);
                 left.Description.Target = enemy.Description;
                 right.Description.Target = enemy.Description;
                 enemy.Description.SetTargets(left.Description, right.Description);

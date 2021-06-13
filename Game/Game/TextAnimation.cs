@@ -25,7 +25,7 @@ namespace Game
             bmp = BitmapExtensions.CreateBitmap(100, 50);
             bmp.MakeTransparent();
             gfx = Graphics.FromImage(bmp);
-            gfx.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;;
+            gfx.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             time = Program.TPS;
         }
 
@@ -34,6 +34,10 @@ namespace Game
             this.ChangeCoordsDelta((time % 4 == 0) ? 1 : 0, -1);
             if (--time <= 0)
             {
+                DrawAction = Program.invisible;
+                bmp.Dispose();
+                gfx.Dispose();
+                font.Dispose();
                 location.RemoveEntity(id);
             }
         }
@@ -42,7 +46,6 @@ namespace Game
         {
             gfx.Clear(Color.Transparent);
             using Brush brush = new SolidBrush(Color.FromArgb((int)(time * 255.0 / Program.TPS), color));
-            //using Brush brush = new SolidBrush(color);
             gfx.DrawString(text, font, brush, 0, 0);
 
             return bmp;
